@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { dummyDateTimeData, dummyShowsData } from "@/assets/assets";
 import Image from "next/image";
 import { timeFormat } from "@/lib/utils";
@@ -24,14 +24,14 @@ const ShowMovieDetail = ({ movieId }: { movieId: string }) => {
   const [show, setShow] = useState(null);
   const dateTimeRef = useRef<HTMLDivElement | null>(null);
 
-  const getShow = () => {
+  const getShow = useCallback(() => {
     const movie = dummyShowsData.find((movie) => movie._id === movieId);
     setShow({ movie, dateTime: dummyDateTimeData });
-  };
+  }, [movieId]);
 
   useEffect(() => {
     getShow();
-  }, [movieId]);
+  }, [getShow]);
 
   if (!show || !show.movie) {
     return <LoadingScreen />;
@@ -54,7 +54,8 @@ const ShowMovieDetail = ({ movieId }: { movieId: string }) => {
 
       {movie.tagline && (
         <p className="italic text-lg text-gray-300 mb-4 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-pink-400" />"{movie.tagline}"
+          <Sparkles className="w-5 h-5 text-pink-400" />
+          &quot;{movie.tagline}&quot;
         </p>
       )}
 
