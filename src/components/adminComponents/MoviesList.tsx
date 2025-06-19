@@ -1,6 +1,12 @@
+import { Show } from "@/lib/types";
 import React from "react";
 
-const MoviesList = ({ list, loading }) => {
+interface MoviesListProps {
+  list: Show[];
+  loading: boolean;
+}
+
+const MoviesList: React.FC<MoviesListProps> = ({ list, loading }) => {
   if (loading) return <p>Loading...</p>;
   if (!list.length) return <p>No movies available</p>;
 
@@ -17,8 +23,8 @@ const MoviesList = ({ list, loading }) => {
         </thead>
         <tbody>
           {list.map((item, index) => {
-            const totalBookings = Object.keys(item.occupiedSeats).length;
-            const totalEarning = totalBookings * item.moviePrice;
+            const totalBookings = Object.keys(item.occupiedSeats || {}).length;
+            const totalEarning = totalBookings * (item.moviePrice || 0);
             return (
               <tr key={index} className="border-t border-gray-300">
                 <td className="px-4 py-2">{item.movie?.title || "N/A"}</td>

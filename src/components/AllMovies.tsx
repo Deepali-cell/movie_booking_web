@@ -2,10 +2,11 @@
 import React from "react";
 import SingleMovieCard from "./SingleMovieCard";
 import { useRouter } from "next/navigation";
+import { Movie } from "@/lib/types";
 
 type AllMoviesProps = {
-  dummyShowsData: [];
-  showMore: boolean;
+  dummyShowsData: Movie[];
+  showMore?: boolean;
 };
 
 const AllMovies: React.FC<AllMoviesProps> = ({

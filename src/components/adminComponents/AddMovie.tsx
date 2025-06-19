@@ -1,4 +1,6 @@
 "use client";
+import { MovieForm } from "@/lib/types";
+import Image from "next/image";
 import React, { useState } from "react";
 
 const genreOptions = [
@@ -10,7 +12,7 @@ const genreOptions = [
 ];
 
 const AddMovie = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<MovieForm>({
     title: "",
     overview: "",
     poster_path: "",
@@ -25,22 +27,28 @@ const AddMovie = () => {
     runtime: "",
   });
 
-  const [posterPreview, setPosterPreview] = useState("");
-  const [backdropPreview, setBackdropPreview] = useState("");
+  const [posterPreview, setPosterPreview] = useState<string>("");
+  const [backdropPreview, setBackdropPreview] = useState<string>("");
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
-  const handleGenreToggle = (id) => {
+  const handleGenreToggle = (id: number) => {
     const updated = form.genres.includes(id)
       ? form.genres.filter((gid) => gid !== id)
       : [...form.genres, id];
     setForm({ ...form, genres: updated });
   };
 
-  const handleCastChange = (index, field, value) => {
+  const handleCastChange = (
+    index: number,
+    field: "name" | "profile_path",
+    value: string
+  ) => {
     const updatedCasts = [...form.casts];
     updatedCasts[index][field] = value;
     setForm({ ...form, casts: updatedCasts });
@@ -53,10 +61,9 @@ const AddMovie = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Movie Data Submitted:", form);
-    // You can replace this with actual API logic
   };
 
   return (
@@ -92,7 +99,7 @@ const AddMovie = () => {
             type="file"
             accept="image/*"
             onChange={(e) => {
-              const file = e.target.files[0];
+              const file = e.target.files?.[0]; // safe optional chaining
               if (file) {
                 const url = URL.createObjectURL(file);
                 setPosterPreview(url);
@@ -101,11 +108,14 @@ const AddMovie = () => {
             }}
             className="w-full p-2 border rounded"
           />
+
           {posterPreview && (
-            <img
+            <Image
               src={posterPreview}
               alt="Poster Preview"
-              className="mt-2 h-48 rounded object-cover"
+              height={48}
+              width={48}
+              className="mt-2 rounded object-cover"
             />
           )}
         </div>
@@ -117,7 +127,7 @@ const AddMovie = () => {
             type="file"
             accept="image/*"
             onChange={(e) => {
-              const file = e.target.files[0];
+              const file = e.target.files?.[0];
               if (file) {
                 const url = URL.createObjectURL(file);
                 setBackdropPreview(url);
@@ -126,11 +136,14 @@ const AddMovie = () => {
             }}
             className="w-full p-2 border rounded"
           />
+
           {backdropPreview && (
-            <img
+            <Image
               src={backdropPreview}
               alt="Backdrop Preview"
-              className="mt-2 h-48 rounded object-cover"
+              height={48}
+              width={48}
+              className="mt-2 rounded object-cover"
             />
           )}
         </div>
@@ -170,7 +183,7 @@ const AddMovie = () => {
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
-                  const file = e.target.files[0];
+                  const file = e.target.files?.[0];
                   if (file) {
                     const url = URL.createObjectURL(file);
                     const updatedCasts = [...form.casts];
@@ -180,11 +193,14 @@ const AddMovie = () => {
                 }}
                 className="w-full p-2 border rounded"
               />
+
               {cast.profile_path && (
-                <img
+                <Image
                   src={cast.profile_path}
                   alt="Cast Preview"
-                  className="h-32 mt-2 rounded object-cover"
+                  height={32}
+                  width={32}
+                  className="mt-2 rounded object-cover"
                 />
               )}
             </div>

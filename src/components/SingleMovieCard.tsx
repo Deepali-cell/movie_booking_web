@@ -1,11 +1,12 @@
 "use client";
+import { Movie } from "@/lib/types";
 import { timeFormat } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { FaLongArrowAltRight } from "react-icons/fa";
 
-const SingleMovieCard = ({ movie }) => {
+const SingleMovieCard = ({ movie }: { movie: Movie }) => {
   const navigate = useRouter();
   return (
     <div className="w-full max-w-xs bg-blue-900 text-white rounded-lg shadow-lg overflow-hidden">

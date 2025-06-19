@@ -3,7 +3,7 @@ import React from "react";
 import { dummyShowsData } from "@/assets/assets";
 import FeaturedSection from "@/components/FeaturedSection";
 
-const page = () => {
+const Page = () => {
   return (
     <div className="pt-20">
       {/* Section Header */}
@@ -17,4 +17,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

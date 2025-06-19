@@ -1,7 +1,15 @@
 import React from "react";
 import Image from "next/image";
+import { Trailer } from "@/lib/types";
 
-const MiniTrailors = ({ trailers, onSelect }) => {
+
+
+export interface MiniTrailorsProps {
+  trailers: Trailer[];
+  onSelect: (trailer: Trailer) => void;
+}
+
+const MiniTrailors: React.FC<MiniTrailorsProps> = ({ trailers, onSelect }) => {
   return (
     <div className="flex flex-wrap gap-4 justify-center">
       {trailers.map((trailer, index) => (

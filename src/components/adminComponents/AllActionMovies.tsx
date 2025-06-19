@@ -1,8 +1,15 @@
 import React from "react";
 import MovieCard from "./MovieCard";
 import FeaturedSection from "../FeaturedSection";
+import { Show } from "@/lib/types";
 
-const AllActionMovies = ({ dummyActiveShows }) => {
+interface AllActionMoviesProps {
+  dummyActiveShows: Show[];
+}
+
+const AllActionMovies: React.FC<AllActionMoviesProps> = ({
+  dummyActiveShows,
+}) => {
   return (
     <div className="px-6 pt-12  text-white">
       <FeaturedSection headerTitle="Action Movies" />

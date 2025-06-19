@@ -2,10 +2,11 @@
 import { dummyShowsData } from "@/assets/assets";
 import AdminFeaturedSection from "@/components/adminComponents/AdminFeaturedSection";
 import MoviesList from "@/components/adminComponents/MoviesList";
+import { Show } from "@/lib/types";
 import React, { useEffect, useState } from "react";
 
 const Page = () => {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
 
   const getList = () => {

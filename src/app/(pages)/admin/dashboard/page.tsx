@@ -5,7 +5,7 @@ import React from "react";
 import { UsersRound, BarChart3, TicketCheck, Film } from "lucide-react";
 import AllActionMovies from "@/components/adminComponents/AllActionMovies";
 
-const page = () => {
+const Page = () => {
   const data = [
     {
       title: "Total Bookings",
@@ -42,4 +42,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

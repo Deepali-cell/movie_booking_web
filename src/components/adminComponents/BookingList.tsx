@@ -1,7 +1,13 @@
+import { Booking } from "@/lib/types";
 import dayjs from "dayjs";
 import React from "react";
 
-const BookingList = ({ list, loading }) => {
+interface BookingListProps {
+  list: Booking[];
+  loading: boolean;
+}
+
+const BookingList: React.FC<BookingListProps> = ({ list, loading }) => {
   if (loading) return <p>Loading...</p>;
   if (!list.length) return <p>No Bookings are available</p>;
 

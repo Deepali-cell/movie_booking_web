@@ -1,8 +1,13 @@
 import Image from "next/image";
 import React from "react";
 import FeaturedSection from "./FeaturedSection";
+import { Cast } from "@/lib/types";
 
-const MovieCastShow = ({ casts }) => {
+export interface MovieCastShowProps {
+  casts: Cast[];
+}
+
+const MovieCastShow: React.FC<MovieCastShowProps> = ({ casts }) => {
   return (
     <div className="p-6">
       <FeaturedSection headerTitle="Movie Cast" />

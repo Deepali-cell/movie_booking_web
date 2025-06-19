@@ -4,7 +4,22 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 
-const ShowMovieDateAndTime = ({ dateTime, id }) => {
+export interface ShowSlot {
+  showId: string;
+  time: string;
+}
+
+export interface ShowMovieDateAndTimeProps {
+  id: string;
+  dateTime: {
+    [date: string]: ShowSlot[];
+  };
+}
+
+const ShowMovieDateAndTime: React.FC<ShowMovieDateAndTimeProps> = ({
+  dateTime,
+  id,
+}) => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const dates = Object.keys(dateTime);

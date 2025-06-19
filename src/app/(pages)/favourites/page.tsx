@@ -3,7 +3,7 @@ import AllMovies from "@/components/AllMovies";
 import FeaturedSection from "@/components/FeaturedSection";
 import React from "react";
 
-const page = () => {
+const Page = () => {
   return (
     <div className="pt-20">
       <FeaturedSection headerTitle="My favorites List" />
@@ -12,4 +12,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

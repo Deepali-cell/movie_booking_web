@@ -19,16 +19,23 @@ import ShowMovieDateAndTime from "./ShowMovieDateAndTime";
 import FeaturedSection from "./FeaturedSection";
 import AllMovies from "./AllMovies";
 import LoadingScreen from "./LoadingScreen";
+import { Movie, ShowDateTime } from "@/lib/types";
+
+type ShowData = {
+  movie: Movie;
+  dateTime: ShowDateTime;
+};
 
 const ShowMovieDetail = ({ movieId }: { movieId: string }) => {
-  const [show, setShow] = useState(null);
+  const [show, setShow] = useState<ShowData | null>(null);
   const dateTimeRef = useRef<HTMLDivElement | null>(null);
 
   const getShow = useCallback(() => {
     const movie = dummyShowsData.find((movie) => movie._id === movieId);
-    setShow({ movie, dateTime: dummyDateTimeData });
+    if (movie) {
+      setShow({ movie, dateTime: dummyDateTimeData });
+    }
   }, [movieId]);
-
   useEffect(() => {
     getShow();
   }, [getShow]);

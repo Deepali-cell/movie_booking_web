@@ -2,10 +2,11 @@
 import { dummyBookingData } from "@/assets/assets";
 import AdminFeaturedSection from "@/components/adminComponents/AdminFeaturedSection";
 import BookingList from "@/components/adminComponents/BookingList";
+import { Booking } from "@/lib/types";
 import React, { useEffect, useState } from "react";
 
-const page = () => {
-  const [bookingList, setbookingList] = useState([]);
+const Page = () => {
+  const [bookingList, setbookingList] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
   const getList = () => {
@@ -21,6 +22,7 @@ const page = () => {
   useEffect(() => {
     getList();
   }, []);
+
   return (
     <div>
       <AdminFeaturedSection headerTitle="Booking List" />
@@ -29,4 +31,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

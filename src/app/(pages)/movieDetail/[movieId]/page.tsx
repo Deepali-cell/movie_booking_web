@@ -1,15 +1,11 @@
-import MovieCastShow from "@/components/MovieCastShow";
+"use client";
 import ShowMovieDetail from "@/components/ShowMovieDetail";
-import React from "react";
+import { useParams } from "next/navigation";
 
-type Props = {
-  params: {
-    movieId: string;
-  };
-};
+const Page = () => {
+  const params = useParams();
+  const movieId = params.movieId as string; // ✅ Fix
 
-const page = ({ params }: Props) => {
-  const { movieId } = params;
   return (
     <div className="pt-20">
       <ShowMovieDetail movieId={movieId} />
@@ -17,4 +13,4 @@ const page = ({ params }: Props) => {
   );
 };
 
-export default page;
+export default Page;

@@ -1,9 +1,14 @@
 "use client";
+import { Show } from "@/lib/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const MovieCard = ({ show }) => {
+interface MovieCardProps {
+  show: Show;
+}
+
+const MovieCard: React.FC<MovieCardProps> = ({ show }) => {
   const router = useRouter();
   const { movie, showPrice } = show;
 

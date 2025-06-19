@@ -3,6 +3,7 @@ import React from "react";
 import dayjs from "dayjs";
 import { dummyBookingData } from "@/assets/assets";
 import FeaturedSection from "@/components/FeaturedSection";
+import Image from "next/image";
 
 const MyBookingsPage = () => {
   return (
@@ -22,9 +23,11 @@ const MyBookingsPage = () => {
               className="flex flex-col md:flex-row bg-[#1e293b] rounded-lg shadow-lg overflow-hidden border border-white/10"
             >
               {/* Movie Poster */}
-              <img
+              <Image
                 src={movie.poster_path}
                 alt={movie.title}
+                width={160} // Equivalent to md:w-40 (40 * 4 = 160px)
+                height={240} // Equivalent to h-60 (60 * 4 = 240px)
                 className="w-full md:w-40 h-60 object-cover"
               />
 
