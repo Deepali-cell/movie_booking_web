@@ -24,7 +24,6 @@ export interface Cast {
 
 export interface Movie {
   _id: string;
-  id: number;
   title: string;
   overview: string;
   poster_path: string;
@@ -42,10 +41,8 @@ export interface Show {
   _id?: string;
   movie: Movie;
   showDateTime?: string;
-  movieDateTime?: string; // used in admin
   showPrice?: number;
-  moviePrice?: number;
-  occupiedSeats?: Record<string, string | undefined>;
+  occupiedSeats: Record<string, string | undefined>;
 }
 export interface MovieForm {
   title: string;

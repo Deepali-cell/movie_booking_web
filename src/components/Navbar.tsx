@@ -48,7 +48,12 @@ const Navbar = () => {
         <FaSearch className="text-white cursor-pointer text-lg" />
         {!user ? (
           <button
-            onClick={() => openSignIn()}
+            onClick={() =>
+              openSignIn({
+                afterSignInUrl: "/roleCheck",
+                afterSignUpUrl: "/roleCheck",
+              })
+            }
             className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-full transition-all duration-300 shadow-md"
           >
             Login

@@ -21,11 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignInUrl="/roleCheck" afterSignUpUrl="/roleCheck">
       <html lang="en">
-        <body
-          className={`${outfit.variable} ntialiased`}
-        >
+        <body className={`${outfit.variable} ntialiased`}>
           <ClientLayout>{children}</ClientLayout>
         </body>
       </html>

@@ -13,13 +13,20 @@ const syncUserCreation = inngest.createFunction(
       await ConnectDb();
       console.log("✅ MongoDB connected");
 
-      const { id, first_name, last_name, email_addresses, image_url } =
-        event.data;
+      const {
+        id,
+        first_name,
+        last_name,
+        email_addresses,
+        image_url,
+        phone_numbers,
+      } = event.data;
       const userData = {
         _id: id,
         name: `${first_name} ${last_name}`,
         email: email_addresses[0].email_address,
         image: image_url,
+        phoneNumber: phone_numbers?.[0]?.phone_number || "",
       };
 
       const savedUser = await User.create(userData);
@@ -49,15 +56,30 @@ const syncUserUpdation = inngest.createFunction(
   { event: "clerk/user.updated" },
   async ({ event }) => {
     await ConnectDb();
-    const { id, first_name, last_name, email_addresses, image_url } =
-      event.data;
+
+    const {
+      id,
+      first_name,
+      last_name,
+      email_addresses,
+      image_url,
+      phone_numbers,
+    } = event.data;
+
+    const existingUser = await User.findById(id);
+    if (!existingUser) {
+      throw new Error("User not found");
+    }
+
     const userData = {
-      _id: id,
-      name: first_name + " " + last_name,
+      name: `${first_name} ${last_name}`,
       email: email_addresses[0].email_address,
       image: image_url,
+      phoneNumber: phone_numbers?.[0]?.phone_number || "",
+      role: existingUser.role, 
     };
-    return User.findByIdAndUpdate(id, userData);
+
+    return User.findByIdAndUpdate(id, userData, { new: true });
   }
 );
 
