@@ -35,7 +35,10 @@ export const showSchema = new mongoose.Schema(
       default: "scheduled",
     },
 
-    showReview: [{ userName: String, comment: String, rating: Number }],
+    showReview: {
+      type: [{ userName: String, comment: String, rating: Number }],
+      default: [],
+    },
   },
   { minimize: false, timestamps: true }
 );

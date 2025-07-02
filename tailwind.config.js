@@ -1,16 +1,16 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}", // for app directory
-    "./pages/**/*.{js,ts,jsx,tsx}", // if you're also using pages
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)'], // ✅ Connect to Outfit
+        sans: ["var(--font-sans)"],
       },
     },
   },
-  plugins: [],
+  plugins: [], // no DaisyUI or other theme plugins
 };

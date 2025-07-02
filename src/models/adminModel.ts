@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const adminSchema = new mongoose.Schema(
   {
-    userId: { type: String, ref: "NewUsers", required: true },
+    userId: { type: String, ref: "User", required: true },
 
     permissions: {
       manageUsers: { type: Boolean, default: true },

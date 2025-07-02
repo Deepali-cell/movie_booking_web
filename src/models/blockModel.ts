@@ -13,7 +13,10 @@ const blockSchema = new mongoose.Schema(
       ref: "Theater",
       required: true,
     },
-    movies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Show" }],
+    movies: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Show" }],
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       "img.youtube.com",
       "image.tmdb.org",
       "i.pravatar.cc",
+      "res.cloudinary.com",
     ],
   },
 };

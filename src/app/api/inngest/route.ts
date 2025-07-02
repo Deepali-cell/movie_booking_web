@@ -8,10 +8,8 @@ const syncUserCreation = inngest.createFunction(
   { id: "sync-user-from-clerk" },
   { event: "clerk/user.created" },
   async ({ event }) => {
-    console.log("🧩 Event received:", event.data);
     try {
       await ConnectDb();
-      console.log("✅ MongoDB connected");
 
       const {
         id,
@@ -21,17 +19,16 @@ const syncUserCreation = inngest.createFunction(
         image_url,
         phone_numbers,
       } = event.data;
+
       const userData = {
         _id: id,
         name: `${first_name} ${last_name}`,
         email: email_addresses[0].email_address,
         image: image_url,
-        phoneNumber: phone_numbers?.[0]?.phone_number || "",
+        phoneNumber: phone_numbers?.[0]?.phone_number || "not-provided",
       };
 
       const savedUser = await User.create(userData);
-      console.log("✅ User created in MongoDB:", savedUser);
-
       return savedUser;
     } catch (err) {
       console.error("❌ Error creating user:", err);
@@ -75,8 +72,9 @@ const syncUserUpdation = inngest.createFunction(
       name: `${first_name} ${last_name}`,
       email: email_addresses[0].email_address,
       image: image_url,
-      phoneNumber: phone_numbers?.[0]?.phone_number || "",
-      role: existingUser.role, 
+      phoneNumber: phone_numbers?.[0]?.phone_number || "not-provided",
+
+      role: existingUser.role,
     };
 
     return User.findByIdAndUpdate(id, userData, { new: true });

@@ -3,6 +3,8 @@ import "./globals.css";
 import { Outfit } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClientLayout from "@/components/ClientLayout";
+import { Toaster } from "react-hot-toast";
+import { StateContextProvider } from "@/context/StateContextProvider";
 
 const outfit = Outfit({
   variable: "--font-sans",
@@ -21,12 +23,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider afterSignInUrl="/roleCheck" afterSignUpUrl="/roleCheck">
-      <html lang="en">
-        <body className={`${outfit.variable} ntialiased`}>
-          <ClientLayout>{children}</ClientLayout>
-        </body>
-      </html>
+    <ClerkProvider>
+      <StateContextProvider>
+        <html lang="en">
+          <body className={`${outfit.variable} antialiased`}>
+            <ClientLayout>{children}</ClientLayout>
+          </body>
+        </html>
+      </StateContextProvider>
     </ClerkProvider>
   );
 }

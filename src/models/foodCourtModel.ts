@@ -17,10 +17,21 @@ const foodCourtSchema = new mongoose.Schema(
         default: "self-service",
       },
       allowsAllergyNote: { type: Boolean, default: true },
-      orderReviews: [{ userName: String, comment: String, rating: Number }],
+      orderReviews: {
+        type: [
+          {
+            userName: String,
+            comment: String,
+            rating: Number,
+            createdAt: { type: Date, default: Date.now },
+          },
+        ],
+        default: [],
+      },
     },
   },
   { timestamps: true }
 );
-const foodCourtModel = mongoose.model("FoodCourt", foodCourtSchema);
+const foodCourtModel =
+  mongoose.models.FoodCourt || mongoose.model("FoodCourt", foodCourtSchema);
 export default foodCourtModel;

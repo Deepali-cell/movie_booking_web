@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 
 const theaterSchema = new mongoose.Schema(
   {
-    // owner
-    theaterOwner: { type: mongoose.Schema.Types.ObjectId, ref: "TheaterOwner" },
+    theaterOwner: { type: String, ref: "User" },
     // 🏢 Basic Info
     name: { type: String, required: true },
     description: { type: String },
@@ -14,10 +13,10 @@ const theaterSchema = new mongoose.Schema(
     location: {
       addressLine: String,
       city: String,
-      state: String,
+      state: String, 
       country: String,
       pincode: String,
-      landmarks: [String], // ["Near Metro", "Opposite Mall"]
+      landmarks: { type: [String], default: [] },
     },
 
     // ☎️ Contact
@@ -31,38 +30,60 @@ const theaterSchema = new mongoose.Schema(
     basicServices: {
       type: [String],
       required: true,
+      default: [],
     },
 
     // 🛋️ Screens
-    screens: [
-      {
-        name: { type: String, required: true }, // "Screen 1"
-        capacity: { type: Number, required: true },
-        type: {
-          type: String,
-          enum: ["Normal", "3D", "IMAX"],
-          default: "Normal",
+    screens: {
+      type: [
+        {
+          name: { type: String, required: true },
+          capacity: { type: Number, required: true },
+          type: {
+            type: String,
+            enum: ["Normal", "3D", "IMAX"],
+            default: "Normal",
+          },
         },
-      },
-    ],
-    // 🧱 Blocks inside Theater
-    blocks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Block" }],
+      ],
+      default: [],
+    },
+    // block
+    blocks: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Block" }],
+      default: [],
+    },
 
     // 🎬 all Movies Currently Playing in theater
-    moviesPlaying: [{ type: mongoose.Schema.Types.ObjectId, ref: "Show" }],
-
+    moviesPlaying: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Show" }],
+      default: [],
+    },
+    allMovies: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
+      default: [],
+    },
     // 🎭 Supported Genres & Languages
-    supportedGenres: [String],
+    supportedGenres: {
+      type: [String],
+      default: [],
+    },
     supportedLanguages: {
       type: [String],
       default: ["Hindi", "English"],
     },
 
     // 🧩 Facilities (Structured with location & category info)
-    facilities: [facilitySchema],
+    facilities: {
+      type: [facilitySchema],
+      default: [],
+    },
 
     // 🍟 Food & Service
-    foodCourts: [{ type: mongoose.Schema.Types.ObjectId, ref: "CourtModel" }],
+    foodCourts: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodCourt" }],
+      default: [],
+    },
 
     // ⏰ Hours & Off Days
     operatingHours: {
@@ -77,16 +98,19 @@ const theaterSchema = new mongoose.Schema(
     // ⭐ Reviews & Ratings
     ratings: {
       cleaningRating: { type: Number, default: 4.5 },
-      totalRatings: { type: Number, default: 0 },
+      totalRatings: { type: Number, default: 4 },
     },
-    reviews: [
-      {
-        userName: String,
-        comment: String,
-        rating: Number,
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
+    reviews: {
+      type: [
+        {
+          userName: String,
+          comment: String,
+          rating: Number,
+          createdAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
 
     // 🔒 Admin Controls
     isActive: { type: Boolean, default: true },

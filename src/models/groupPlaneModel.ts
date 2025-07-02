@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 export const groupPlanSchema = new mongoose.Schema(
   {
-    creator: { type: String, ref: "NewUsers", required: true },
+    creator: { type: String, ref: "User", required: true },
     inviteLink: { type: String, required: true, unique: true }, // e.g. UUID
     theater: { type: mongoose.Schema.Types.ObjectId, ref: "Theater" },
-    invitedUsers: [{ type: String, ref: "NewUsers" }],
+    invitedUsers: [{ type: String, ref: "User" }],
     selectedMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Show" }],
     votes: [
       {

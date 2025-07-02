@@ -7,14 +7,18 @@ export const movieSchema = new mongoose.Schema(
     poster_path: { type: String, required: true },
     backdrop_path: { type: String, required: true },
     tagline: { type: String, required: true },
-    genres: [{ id: Number, name: String }],
-    casts: [{ name: String, profile_path: String }],
+    genres: { type: [{ id: Number, name: String }], default: [] },
+    casts: { type: [{ name: String, profile_path: String }], default: [] },
     original_language: { type: String, required: true },
     release_date: { type: String, required: true },
     vote_average: { type: Number, required: true },
     vote_count: { type: Number, required: true },
     runtime: { type: Number, required: true },
-    shorts: [{ type: String, default: "" }],
+    shorts: { type: [{ type: String, default: "" }], default: [] },
+    movieReview: {
+      type: [{ userName: String, comment: String, rating: Number }],
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -8,14 +8,14 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true },
     image: { type: String, required: true },
     phoneNumber: { type: String, required: true },
-
     role: {
       type: String,
       enum: ["user", "owner", "admin"],
     },
+    favourites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }], // <-- Add this
   },
   { timestamps: true }
 );
 
-const User = mongoose.models.User || mongoose.model("NewUsers", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;
