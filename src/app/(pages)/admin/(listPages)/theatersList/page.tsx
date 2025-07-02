@@ -23,22 +23,22 @@ const AdminTheaterListPage = () => {
               key={index}
               className="text-white bg-gray-900 border border-gray-700 p-4 rounded-lg shadow-md hover:shadow-lg transition"
             >
-              <div className="mb-3">
-                <Image
-                  src={theater.image}
-                  alt={theater.name}
-                  fill
-                  className="object-cover rounded"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-              </div>
-
               <h2 className="text-xl font-semibold">{theater.name}</h2>
               <p className="text-sm text-gray-400 italic mb-2 capitalize">
                 Tier: {theater.tier}
               </p>
 
               <div className="text-sm space-y-1">
+                <div className="mb-3">
+                  <Image
+                    src={theater.image}
+                    alt={theater.name}
+                    width={400}
+                    height={160}
+                    className="object-cover w-full rounded"
+                  />
+                </div>
+
                 <p>
                   📍 {theater.location?.city}, {theater.location?.state}
                 </p>

@@ -63,13 +63,14 @@ const AdminTheaterShowsPage = () => {
               key={idx}
               className="bg-gray-800 p-4 rounded border border-gray-600 shadow"
             >
-              <Image
-                src={show.movie?.poster_path}
-                alt={show.movie?.title}
-                fill
-                className="object-cover rounded"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
+              <div className="mb-3 w-full h-40 relative">
+                <Image
+                  src={show.movie?.poster_path}
+                  alt={show.movie?.title}
+                  fill
+                  className="object-cover rounded"
+                />
+              </div>
               <h2 className="text-lg font-semibold">{show.movie?.title}</h2>
               <p className="text-sm text-gray-400 italic">
                 {show.movie?.tagline}
