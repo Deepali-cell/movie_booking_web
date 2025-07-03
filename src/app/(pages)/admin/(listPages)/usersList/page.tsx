@@ -54,13 +54,13 @@ const Page = () => {
             >
               {/* User Image */}
               <div className="flex items-center gap-4">
-                <Image
+                {/* <Image
                   src={user.image}
                   alt={user.name}
                   width={56}
                   height={56}
                   className="w-14 h-14 rounded-full border border-gray-600 object-cover"
-                />
+                /> */}
 
                 <div>
                   <h3 className="text-lg font-semibold">{user.name}</h3>

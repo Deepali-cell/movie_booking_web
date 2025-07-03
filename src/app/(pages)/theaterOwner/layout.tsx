@@ -9,6 +9,7 @@ import {
   CalendarClock,
   ClipboardList,
   Home,
+  Video,
 } from "lucide-react";
 import { GiFoodTruck } from "react-icons/gi";
 
@@ -47,6 +48,11 @@ export default function AdminLayout({
       icon: <GiFoodTruck size={20} />,
     },
     {
+      label: "Add New Short",
+      href: "/theaterOwner/addNewShorts",
+      icon: <Video size={20} />,
+    },
+    {
       label: "Add New item to the foodCourt",
       href: "/theaterOwner/addItemToFoodCourt",
       icon: <GiFoodTruck size={20} />,
@@ -56,6 +62,7 @@ export default function AdminLayout({
       href: "/theaterOwner/moviesList",
       icon: <ListOrdered size={20} />,
     },
+
     {
       label: "Theaters List",
       href: "/theaterOwner/theatersList",

@@ -6,6 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 import Loading from "@/components/common/Loading";
+import CustomReview from "@/components/reviewComponents/CustomReview";
+import ShowReview from "@/components/reviewComponents/ShowReview";
 
 const MovieDetailPage = () => {
   const { movieId } = useParams();
@@ -119,26 +121,15 @@ const MovieDetailPage = () => {
       )}
 
       {/* Reviews */}
-      <div className="mt-10">
-        <h2 className="text-xl font-semibold mb-3">📝 Reviews</h2>
-        {movie.movieReview && movie.movieReview.length > 0 ? (
-          <div className="space-y-4">
-            {movie.movieReview.map((review: any, index: number) => (
-              <div
-                key={index}
-                className="border border-gray-600 rounded p-3 bg-gray-800 shadow"
-              >
-                <p className="font-semibold text-sm">{review.userName}</p>
-                <p className="text-sm text-gray-300 italic">
-                  "{review.comment}"
-                </p>
-                <p className="text-yellow-400 text-sm">⭐ {review.rating}/10</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-400 italic">No reviews yet.</p>
-        )}
+      <div className="mt-8">
+        {/* Add review form */}
+        <CustomReview type="movie" id={movie._id} />
+
+        {/* Show reviews */}
+        <h3 className="text-xl font-semibold mt-8 mb-4 text-white">
+          📝 Customer Reviews
+        </h3>
+        <ShowReview reviews={movie.movieReview} />
       </div>
     </div>
   );

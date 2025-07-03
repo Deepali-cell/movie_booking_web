@@ -20,6 +20,7 @@ const foodCourtSchema = new mongoose.Schema(
       orderReviews: {
         type: [
           {
+            userId: String,
             userName: String,
             comment: String,
             rating: Number,

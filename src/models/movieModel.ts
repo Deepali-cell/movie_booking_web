@@ -16,7 +16,15 @@ export const movieSchema = new mongoose.Schema(
     runtime: { type: Number, required: true },
     shorts: { type: [{ type: String, default: "" }], default: [] },
     movieReview: {
-      type: [{ userName: String, comment: String, rating: Number }],
+      type: [
+        {
+          userId: String,
+          userName: String,
+          comment: String,
+          rating: Number,
+          createdAt: { type: Date, default: Date.now },
+        },
+      ],
       default: [],
     },
   },

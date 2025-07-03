@@ -172,6 +172,7 @@ export interface ShowType {
     userName: string;
     comment: string;
     rating: number;
+    createdAt: string;
   }[];
   createdAt: string;
   updatedAt: string;

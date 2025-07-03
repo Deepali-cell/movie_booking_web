@@ -42,13 +42,13 @@ const Page = () => {
             >
               {/* Owner Profile */}
               <div className="flex items-center gap-4 mb-4">
-                <Image
+                {/* <Image
                   src={owner.userId.image}
                   alt={owner.userId.name}
                   fill
                   className="object-cover"
                   sizes="56px" // matches w-14 (14 * 4 = 56px)
-                />
+                /> */}
                 <div>
                   <h3 className="text-lg font-semibold">{owner.userId.name}</h3>
                   <p className="text-sm text-gray-400">{owner.userId.email}</p>

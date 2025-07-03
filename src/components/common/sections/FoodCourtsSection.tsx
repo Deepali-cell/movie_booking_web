@@ -3,6 +3,8 @@ import React from "react";
 import Loading from "../Loading";
 import { FoodCourtType, FoodItemType } from "@/lib/types";
 import Image from "next/image";
+import CustomReview from "@/components/reviewComponents/CustomReview";
+import ShowReview from "@/components/reviewComponents/ShowReview";
 
 const FoodCourtsSection = ({ foodCourts }: { foodCourts: FoodCourtType[] }) => {
   if (!foodCourts) return <Loading />;
@@ -57,48 +59,15 @@ const FoodCourtsSection = ({ foodCourts }: { foodCourts: FoodCourtType[] }) => {
               </div>
             ))}
           </div>
+          <div className="mt-8">
+            {/* Add review form */}
+            <CustomReview type="foodcourt" id={fc._id} />
 
-          {/* Reviews */}
-          {fc.foodService?.orderReviews?.length > 0 && (
-            <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-2">
-                📝 Customer Reviews
-              </h4>
-              <div className="space-y-3">
-                {fc.foodService.orderReviews.map((review, i: number) => (
-                  <div
-                    key={i}
-                    className="bg-gray-800 rounded-md p-3 text-sm text-gray-300"
-                  >
-                    <p className="italic">{review.comment}</p>
-                    <p className="text-xs mt-1">
-                      — {review.userName} ⭐ {review.rating}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {/* Reviews */}
-          <div className="mt-6">
-            <h4 className="text-lg font-semibold mb-2">📝 Customer Reviews</h4>
-            {fc.foodService.orderReviews.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">No reviews yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {fc.foodService.orderReviews.map((review, i: number) => (
-                  <div
-                    key={i}
-                    className="bg-gray-800 rounded-md p-3 text-sm text-gray-300"
-                  >
-                    <p className="italic">{review.comment}</p>
-                    <p className="text-xs mt-1">
-                      — {review.userName} ⭐ {review.rating}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Show reviews */}
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-white">
+              📝 Customer Reviews
+            </h3>
+            <ShowReview reviews={fc.foodService.orderReviews} />
           </div>
         </div>
       ))}

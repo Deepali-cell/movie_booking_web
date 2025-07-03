@@ -14,21 +14,6 @@ type SidebarItemType = {
 const SideBar = ({ sidebarItems }: { sidebarItems: SidebarItemType[] }) => {
   return (
     <div className="min-h-screen w-64 border-r border-amber-50 text-white flex flex-col p-4 shadow-xl bg-black">
-      {/* Admin Info */}
-      <div className="flex items-center gap-3 mb-10">
-        <Image
-          src="https://i.pravatar.cc/100?img=67"
-          alt="Admin"
-          height={50}
-          width={50}
-          className="rounded-full border-2 border-yellow-400"
-        />
-        <div>
-          <p className="font-semibold text-lg">Owner</p>
-          <p className="text-xs text-gray-400">owner@example.com</p>
-        </div>
-      </div>
-
       {/* Navigation Items */}
       <nav className="flex flex-col gap-2">
         {sidebarItems.map((item) => (

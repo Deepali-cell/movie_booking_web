@@ -1,8 +1,8 @@
 "use client";
 
 import React, { FormEvent } from "react";
-import { MovieFormType, TheaterType } from "@/lib/types";
 import Image from "next/image";
+import { MovieFormType, TheaterType } from "@/lib/types";
 
 interface MovieFormProps {
   formData: MovieFormType;
@@ -31,15 +31,9 @@ const MovieForm: React.FC<MovieFormProps> = ({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleGenresChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const genresArray = e.target.value.split(",").map((s) => s.trim());
-    setFormData((prev) => ({
-      ...prev,
-      genres: genresArray.map((name, index) => ({ id: index, name })),
+      [name]: ["vote_average", "vote_count", "runtime"].includes(name)
+        ? Number(value)
+        : value,
     }));
   };
 
@@ -62,6 +56,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
       onSubmit={onSubmit}
       className="space-y-6 bg-gray-900 p-6 rounded-xl text-white"
     >
+      {/* BASIC INPUTS */}
       <div>
         <label className="block mb-1 font-semibold">🎬 Title</label>
         <input
@@ -86,20 +81,76 @@ const MovieForm: React.FC<MovieFormProps> = ({
       </div>
 
       <div>
-        <label className="block mb-1 font-semibold">
-          🎭 Genres (comma separated)
-        </label>
+        <label className="block mb-1 font-semibold">📝 Tagline</label>
         <input
           type="text"
-          value={formData.genres.map((g) => g.name).join(", ")}
-          onChange={handleGenresChange}
+          name="tagline"
+          value={formData.tagline}
+          onChange={handleChange}
           className="w-full p-2 rounded bg-gray-800 border border-gray-700"
         />
       </div>
 
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className="block mb-1 font-semibold">🌐 Language</label>
+          <input
+            type="text"
+            name="original_language"
+            value={formData.original_language}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          />
+        </div>
+        <div>
+          <label className="block mb-1 font-semibold">📅 Release Date</label>
+          <input
+            type="date"
+            name="release_date"
+            value={formData.release_date}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          />
+        </div>
+        <div>
+          <label className="block mb-1 font-semibold">⭐ Rating</label>
+          <input
+            type="number"
+            name="vote_average"
+            value={formData.vote_average}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block mb-1 font-semibold">👍 Vote Count</label>
+          <input
+            type="number"
+            name="vote_count"
+            value={formData.vote_count}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          />
+        </div>
+        <div>
+          <label className="block mb-1 font-semibold">⏱️ Runtime (min)</label>
+          <input
+            type="number"
+            name="runtime"
+            value={formData.runtime}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          />
+        </div>
+      </div>
+
+      {/* POSTER & BACKDROP */}
       <div className="flex gap-4">
         <div className="flex-1">
-          <label className="block mb-1 font-semibold">🖼️ Poster Image</label>
+          <label className="block mb-1 font-semibold">🖼️ Poster</label>
           <input
             type="file"
             accept="image/*"
@@ -113,14 +164,12 @@ const MovieForm: React.FC<MovieFormProps> = ({
                 alt="Poster"
                 fill
                 className="rounded object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
           )}
         </div>
-
         <div className="flex-1">
-          <label className="block mb-1 font-semibold">🖼️ Backdrop Image</label>
+          <label className="block mb-1 font-semibold">🖼️ Backdrop</label>
           <input
             type="file"
             accept="image/*"
@@ -134,13 +183,13 @@ const MovieForm: React.FC<MovieFormProps> = ({
                 alt="Backdrop"
                 fill
                 className="rounded object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
           )}
         </div>
       </div>
 
+      {/* SELECT THEATER */}
       <div>
         <label className="block mb-1 font-semibold">🏛️ Select Theater</label>
         <select
@@ -158,6 +207,155 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </select>
       </div>
 
+      {/* GENRES */}
+      <div>
+        <label className="block mb-1 font-semibold">🎭 Genres</label>
+        {formData.genres.map((genre, idx) => (
+          <div key={idx} className="flex gap-2 mb-2">
+            <input
+              type="text"
+              value={genre.name}
+              onChange={(e) => {
+                const newGenres = [...formData.genres];
+                newGenres[idx].name = e.target.value;
+                setFormData((prev) => ({ ...prev, genres: newGenres }));
+              }}
+              className="flex-1 p-2 rounded bg-gray-800 border border-gray-700"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const newGenres = formData.genres.filter((_, i) => i !== idx);
+                setFormData((prev) => ({ ...prev, genres: newGenres }));
+              }}
+              className="bg-red-600 px-2 rounded"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFormData((prev) => ({
+              ...prev,
+              genres: [...prev.genres, { id: prev.genres.length, name: "" }],
+            }))
+          }
+          className="bg-green-600 px-4 py-1 rounded mt-2"
+        >
+          + Add Genre
+        </button>
+      </div>
+
+      {/* CASTS */}
+      <div>
+        <label className="block mb-1 font-semibold">🎭 Casts</label>
+        {formData.casts.map((cast, idx) => (
+          <div key={idx} className="flex gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="Name"
+              value={cast.name}
+              onChange={(e) => {
+                const newCasts = [...formData.casts];
+                newCasts[idx].name = e.target.value;
+                setFormData((prev) => ({ ...prev, casts: newCasts }));
+              }}
+              className="flex-1 p-2 rounded bg-gray-800 border border-gray-700"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file && uploadFile) {
+                  const url = await uploadFile(file);
+                  const newCasts = [...formData.casts];
+                  newCasts[idx].profile_path = url;
+                  setFormData((prev) => ({ ...prev, casts: newCasts }));
+                }
+              }}
+              className="flex-1"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const newCasts = formData.casts.filter((_, i) => i !== idx);
+                setFormData((prev) => ({ ...prev, casts: newCasts }));
+              }}
+              className="bg-red-600 px-2 rounded"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFormData((prev) => ({
+              ...prev,
+              casts: [...prev.casts, { name: "", profile_path: "" }],
+            }))
+          }
+          className="bg-green-600 px-4 py-1 rounded mt-2"
+        >
+          + Add Cast
+        </button>
+      </div>
+      {/* SHORTS */}
+      <div>
+        <label className="block mb-1 font-semibold">🎞️ Shorts</label>
+        {formData.shorts.map((short, idx) => (
+          <div key={idx} className="flex gap-2 mb-2 items-center">
+            <input
+              type="file"
+              accept="video/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file && uploadFile) {
+                  const url = await uploadFile(file);
+                  const newShorts = [...formData.shorts];
+                  newShorts[idx] = url;
+                  setFormData((prev) => ({ ...prev, shorts: newShorts }));
+                }
+              }}
+              className="flex-1 p-2 bg-gray-800 rounded"
+            />
+            {short && (
+              <video
+                src={short}
+                controls
+                className="w-32 h-20 rounded object-cover"
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                const newShorts = formData.shorts.filter((_, i) => i !== idx);
+                setFormData((prev) => ({ ...prev, shorts: newShorts }));
+              }}
+              className="bg-red-600 px-2 rounded"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFormData((prev) => ({
+              ...prev,
+              shorts: [...prev.shorts, ""],
+            }))
+          }
+          className="bg-green-600 px-4 py-1 rounded mt-2"
+        >
+          + Add Short
+        </button>
+      </div>
+
+      {/* SUBMIT */}
       <div className="flex justify-end">
         <button
           type="submit"

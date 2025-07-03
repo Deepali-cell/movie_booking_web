@@ -7,6 +7,8 @@ import Loading from "../Loading";
 import { useClerk, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { ShowType } from "@/lib/types";
+import CustomReview from "@/components/reviewComponents/CustomReview";
+import ShowReview from "@/components/reviewComponents/ShowReview";
 
 const ShowsSection = ({ shows }: { shows: ShowType[] }) => {
   const router = useRouter();
@@ -252,25 +254,16 @@ const ShowsSection = ({ shows }: { shows: ShowType[] }) => {
                   </div>
                 </div>
               </div>
+              {/* Reviews */}
+              <div className="mt-8">
+                {/* Add review form */}
+                <CustomReview type="show" id={show._id} />
 
-              <div className="w-full md:w-1/4 text-white">
-                <p className="font-semibold mb-2">📝 Reviews:</p>
-                {show.showReview?.length === 0 ? (
-                  <p className="text-sm italic text-gray-400">
-                    No reviews yet.
-                  </p>
-                ) : (
-                  <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
-                    {show.showReview.map((review, i: number) => (
-                      <div
-                        key={i}
-                        className="text-sm text-gray-300 italic border-b border-gray-700 pb-1"
-                      >
-                        {review.comment} — {review.userName} ⭐ {review.rating}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Show reviews */}
+                <h3 className="text-xl font-semibold mt-8 mb-4 text-white">
+                  📝 Customer Reviews
+                </h3>
+                <ShowReview reviews={show.showReview} />
               </div>
             </div>
           ))}

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { TheaterFormDataType } from "../commonComponentsOfOwner/TheaterForm";
 
 const languages = ["Hindi", "English", "Tamil", "Telugu", "Bengali"];
-const genres = ["Action", "Comedy", "Drama", "Horror", "Sci-Fi"];
+const genres = ["Action", "Comedy", "Drama", "Horror", "Romance", "Thriller"];
 
 type Props = {
   supportedLanguages: string[];

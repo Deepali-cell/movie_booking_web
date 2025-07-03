@@ -36,7 +36,15 @@ export const showSchema = new mongoose.Schema(
     },
 
     showReview: {
-      type: [{ userName: String, comment: String, rating: Number }],
+      type: [
+        {
+          userId: String,
+          userName: String,
+          comment: String,
+          rating: Number,
+          createdAt: { type: Date, default: Date.now },
+        },
+      ],
       default: [],
     },
   },

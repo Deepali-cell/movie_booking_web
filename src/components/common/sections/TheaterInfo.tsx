@@ -1,10 +1,29 @@
 "use client";
 
+import CustomReview from "@/components/reviewComponents/CustomReview";
+import ShowReview from "@/components/reviewComponents/ShowReview";
 import { TheaterType } from "@/lib/types";
+import axios from "axios";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const TheaterInfo = ({ theater }: { theater: TheaterType }) => {
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(
+          `/api/review/getReview?type=theater&id=${theater._id}`
+        );
+        setReviews(res.data.reviews);
+      } catch (err) {
+        console.error("Failed to load reviews", err);
+      }
+    };
+
+    fetchReviews();
+  }, [theater._id]);
   return (
     <div className="bg-black rounded-2xl shadow-lg text-white p-6 max-w-5xl mx-auto my-6">
       <div className="mb-4">
@@ -162,18 +181,9 @@ const TheaterInfo = ({ theater }: { theater: TheaterType }) => {
         ))}
 
         <div className="mt-6 text-sm">
-          <p>
-            <strong>Reviews:</strong>
-          </p>
-          {(theater.reviews ?? []).length === 0 ? (
-            <p className="ml-4 italic text-gray-400">No reviews yet.</p>
-          ) : (
-            (theater.reviews ?? []).map((rev, i) => (
-              <div key={i} className="ml-4 italic text-gray-300">
-                "{rev.comment}" - {rev.userName} ⭐ {rev.rating}
-              </div>
-            ))
-          )}
+          <CustomReview type="theater" id={theater._id} />
+
+          <ShowReview reviews={theater.reviews} />
         </div>
       </div>
     </div>

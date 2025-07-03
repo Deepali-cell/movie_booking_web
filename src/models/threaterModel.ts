@@ -13,7 +13,7 @@ const theaterSchema = new mongoose.Schema(
     location: {
       addressLine: String,
       city: String,
-      state: String, 
+      state: String,
       country: String,
       pincode: String,
       landmarks: { type: [String], default: [] },
@@ -103,6 +103,7 @@ const theaterSchema = new mongoose.Schema(
     reviews: {
       type: [
         {
+          userId: String,
           userName: String,
           comment: String,
           rating: Number,
