@@ -27,6 +27,12 @@ export default function GroupPage() {
         const { data } = await axios.get(
           `/api/groupData?inviteLink=${inviteLink}`
         );
+
+        if (!data.success) {
+          toast.error(data.message || "Group data nahi mila");
+          return;
+        }
+
         if (
           data.group.finalMovie ||
           ["split", "singlePaid", "completed"].includes(
@@ -34,9 +40,8 @@ export default function GroupPage() {
           )
         ) {
           router.push(`/splitStatus/${inviteLink}`);
-          return;
         } else {
-          toast.error(data.message);
+          setGroup(data.group); // 👈 ye zaroori hai taaki page render ho
         }
       } catch (err) {
         console.error(err);

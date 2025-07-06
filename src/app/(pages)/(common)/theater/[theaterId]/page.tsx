@@ -5,7 +5,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import TheaterInfo from "@/components/common/sections/TheaterInfo";
 import Sidebar from "@/components/common/sections/Sidebar";
-import MoviesSection from "@/components/common/sections/MovieSection";
 import ShowsSection from "@/components/common/sections/ShowsSection";
 import FoodCourtsSection from "@/components/common/sections/FoodCourtsSection";
 import Loading from "@/components/common/Loading";
@@ -18,6 +17,7 @@ const Page = () => {
     "overview" | "shows" | "foodcourts"
   >("overview");
 
+  // ✅ API call to fetch theater details
   const fetchTheaterDetails = useCallback(async () => {
     try {
       const { data } = await axios.get(
@@ -33,8 +33,19 @@ const Page = () => {
     }
   }, [theaterId]);
 
+  // ✅ Page load pe cleanup + theater data
   useEffect(() => {
+    const runCleanup = async () => {
+      try {
+        await axios.get("/api/cleanupShows");
+        console.log("✅ Cleanup done");
+      } catch (err) {
+        console.error("Cleanup error:", err);
+      }
+    };
+
     if (theaterId) {
+      runCleanup();
       fetchTheaterDetails();
     }
   }, [theaterId, fetchTheaterDetails]);

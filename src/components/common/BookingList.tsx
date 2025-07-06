@@ -15,7 +15,13 @@ interface FoodCourtGetDetailsType {
   showStatus?: string;
 }
 
-const BookingList = ({ bookingList }: { bookingList?: BookingType[] }) => {
+const BookingList = ({
+  bookingList,
+  fetchBookingList,
+}: {
+  bookingList?: BookingType[];
+  fetchBookingList: () => void;
+}) => {
   const [activeTicket, setActiveTicket] = useState<BookingType | null>(null);
   const [showFoodOptionModal, setShowFoodOptionModal] = useState(false);
   const [foodCourtGetDetails, setfoodCourtGetDetails] =
@@ -52,6 +58,7 @@ const BookingList = ({ bookingList }: { bookingList?: BookingType[] }) => {
                 setActiveTicket={setActiveTicket}
                 setShowFoodOptionModal={setShowFoodOptionModal}
                 setfoodCourtGetDetail={setfoodCourtGetDetails}
+                fetchBookingList={fetchBookingList}
               />
             </div>
           ))}

@@ -13,6 +13,7 @@ interface BookingCardProps {
   setShowFoodOptionModal: React.Dispatch<React.SetStateAction<boolean>>;
   setActiveTicket: React.Dispatch<React.SetStateAction<BookingType | null>>;
   setfoodCourtGetDetail: React.Dispatch<React.SetStateAction<any>>;
+  fetchBookingList: () => void;
 }
 
 const BookingCard = ({
@@ -20,6 +21,7 @@ const BookingCard = ({
   setShowFoodOptionModal,
   setActiveTicket,
   setfoodCourtGetDetail,
+  fetchBookingList,
 }: BookingCardProps) => {
   const theater =
     typeof b.theater === "string" ? null : (b.theater as TheaterType);
@@ -79,6 +81,7 @@ const BookingCard = ({
       });
       if (data.success) {
         toast.success(data.message);
+        fetchBookingList();
       } else {
         toast.error(data.message || "Failed to cancel booking.");
       }
@@ -97,6 +100,7 @@ const BookingCard = ({
 
       if (data.success) {
         toast.success(data.message);
+        fetchBookingList();
       } else {
         toast.error(data.message || "Failed to delete booking.");
       }

@@ -1,4 +1,5 @@
 "use client";
+import React, { useEffect } from "react";
 import ShowCard from "@/components/ownerComponents/cardComponents/ShowCard";
 import { useStateContext } from "@/context/StateContextProvider";
 import { ShowType } from "@/lib/types";
@@ -6,6 +7,22 @@ import { ShowType } from "@/lib/types";
 const Page = () => {
   const { theaterList, blocks, fetchBlocks, selectedTheaterId } =
     useStateContext();
+
+  // ✅ This runs once on page load
+  useEffect(() => {
+    const runCleanup = async () => {
+      try {
+        const res = await fetch("/api/cleanupShows");
+        const data = await res.json();
+        console.log("Cleanup result:", data.message);
+      } catch (err) {
+        console.error("Error running cleanup:", err);
+      }
+    };
+
+    runCleanup();
+  }, []);
+
   const handleRefresh = () => {
     if (selectedTheaterId) {
       fetchBlocks(selectedTheaterId);

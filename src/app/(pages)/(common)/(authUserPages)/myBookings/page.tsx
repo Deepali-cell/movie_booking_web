@@ -27,7 +27,10 @@ const Page = () => {
   return (
     <div className="flex flex-col min-h-screen pt-20 bg-[#121212]">
       <main className="flex-grow">
-        <BookingList bookingList={bookingList} />
+        <BookingList
+          bookingList={bookingList}
+          fetchBookingList={fetchBookingList}
+        />
       </main>
     </div>
   );
