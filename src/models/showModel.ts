@@ -26,7 +26,7 @@ export const showSchema = new mongoose.Schema(
     },
     occupiedSeats: {
       type: Map,
-      of: Boolean, // e.g., { A1: true, B2: true }
+      of: Boolean,
       default: {},
     },
     status: {
@@ -34,7 +34,6 @@ export const showSchema = new mongoose.Schema(
       enum: ["scheduled", "cancelled", "completed"],
       default: "scheduled",
     },
-
     showReview: {
       type: [
         {
@@ -52,5 +51,4 @@ export const showSchema = new mongoose.Schema(
 );
 
 const Show = mongoose.models.Show || mongoose.model("Show", showSchema);
-
 export default Show;

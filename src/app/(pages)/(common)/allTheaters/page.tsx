@@ -45,7 +45,7 @@ const Page = () => {
   }, [filters]);
 
   return (
-    <div className="p-6 pt-20 min-h-screen flex flex-col items-center">
+    <div className="p-6 pt-20 min-h-screen flex flex-col r">
       <h1 className="text-3xl font-bold mb-8 text-center">
         🎬 Find Your Perfect Theater
       </h1>
@@ -171,7 +171,7 @@ const Page = () => {
 
       <button
         onClick={() => setFilters(defaultFilters)}
-        className="mb-12 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
+        className="mb-12 w-40 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
       >
         Reset Filters
       </button>

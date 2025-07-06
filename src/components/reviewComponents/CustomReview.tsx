@@ -7,9 +7,14 @@ import toast from "react-hot-toast";
 interface CustomReviewProps {
   type: string;
   id: string;
+  refreshReviews?: () => void;
 }
 
-const CustomReview: React.FC<CustomReviewProps> = ({ type, id }) => {
+const CustomReview: React.FC<CustomReviewProps> = ({
+  type,
+  id,
+  refreshReviews,
+}) => {
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number>(5);
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,18 +24,21 @@ const CustomReview: React.FC<CustomReviewProps> = ({ type, id }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         `/api/review/commonReview?type=${type}&id=${id}`,
         {
           comment,
           rating,
         }
       );
-
-      toast.success("✅ Review added successfully!");
-
-      setComment("");
-      setRating(5);
+      if (data.success) {
+        toast.success("✅ Review added successfully!");
+        refreshReviews?.();
+        setComment("");
+        setRating(5);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error: any) {
       console.error("Error submitting review:", error);
       if (error.response && error.response.status === 401) {
@@ -44,16 +52,16 @@ const CustomReview: React.FC<CustomReviewProps> = ({ type, id }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-6">
+    <div className="max-w-4xl mx-auto py-6 ">
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
         Share Your Experience ✍️
       </h2>
       <form
         onSubmit={handleSubmit}
-        className="flex items-center gap-4 p-4 rounded-xl shadow-lg border hover:shadow-xl transition"
+        className="bg-black flex flex-wrap items-center gap-4 p-4 rounded-xl shadow-lg border hover:shadow-xl transition"
       >
         {/* Comment */}
-        <div className="flex items-center gap-2 flex-[2]">
+        <div className="flex items-center gap-2 flex-[2] min-w-[200px] flex-grow">
           <FaCommentDots className="text-green-600 text-xl" />
           <input
             type="text"
@@ -66,12 +74,12 @@ const CustomReview: React.FC<CustomReviewProps> = ({ type, id }) => {
         </div>
 
         {/* Rating */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-[150px] flex-grow">
           <FaStar className="text-yellow-500 text-xl" />
           <select
             value={rating}
             onChange={(e) => setRating(Number(e.target.value))}
-            className="p-3 border rounded-md focus:outline-none bg-black focus:ring-2 focus:ring-blue-400"
+            className="p-3 border rounded-md focus:outline-none bg-black focus:ring-2 focus:ring-blue-400 w-full"
           >
             {[5, 4, 3, 2, 1].map((num) => (
               <option key={num} value={num}>
@@ -80,11 +88,12 @@ const CustomReview: React.FC<CustomReviewProps> = ({ type, id }) => {
             ))}
           </select>
         </div>
+
         {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
+          className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400 w-full sm:w-auto"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>

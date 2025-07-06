@@ -1,6 +1,8 @@
 import ConnectDb from "@/lib/ConnectDb";
 import { NextRequest, NextResponse } from "next/server";
 import Show from "@/models/showModel";
+import "@/models/movieModel";
+import "@/models/blockModel";
 
 export async function GET(req: NextRequest) {
   await ConnectDb();

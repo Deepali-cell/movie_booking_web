@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
@@ -14,25 +14,23 @@ const MovieDetailPage = () => {
   const router = useRouter();
   const [movie, setMovie] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchMovie = async () => {
-      try {
-        const { data } = await axios.get(
-          `/api/getMovieById?movieId=${movieId}`
-        );
-        if (data.success) {
-          setMovie(data.movie);
-        } else {
-          toast.error(data.message);
-        }
-      } catch (error: any) {
-        console.error("Error fetching movie:", error);
-        toast.error("Failed to fetch movie");
+  const fetchMovie = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`/api/getMovieById?movieId=${movieId}`);
+      if (data.success) {
+        setMovie(data.movie);
+      } else {
+        toast.error(data.message);
       }
-    };
-
-    if (movieId) fetchMovie();
+    } catch (error: any) {
+      console.error("Error fetching movie:", error);
+      toast.error("Failed to fetch movie");
+    }
   }, [movieId]);
+
+  useEffect(() => {
+    if (movieId) fetchMovie();
+  }, [movieId, fetchMovie]);
 
   if (!movie) {
     return <Loading />;
@@ -123,13 +121,18 @@ const MovieDetailPage = () => {
       {/* Reviews */}
       <div className="mt-8">
         {/* Add review form */}
-        <CustomReview type="movie" id={movie._id} />
+        <CustomReview type="movie" id={movie._id} refreshReviews={fetchMovie} />
 
         {/* Show reviews */}
         <h3 className="text-xl font-semibold mt-8 mb-4 text-white">
           📝 Customer Reviews
         </h3>
-        <ShowReview reviews={movie.movieReview} />
+        <ShowReview
+          reviews={movie.movieReview}
+          type="movie"
+          id={movie._id}
+          refreshReviews={fetchMovie}
+        />
       </div>
     </div>
   );

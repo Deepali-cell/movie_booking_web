@@ -64,8 +64,12 @@ const Page = () => {
       );
       if (res.data.success) {
         toast.success(res.data.message);
-        if (selectedTheaterId)
-          fetchFoodCourts(selectedTheaterId, selectedBlock || undefined);
+        if (selectedTheaterId) {
+          setFoodCourts([]); // clear list immediately
+          setLoading(true);
+          await fetchFoodCourts(selectedTheaterId, selectedBlock || undefined);
+          setLoading(false);
+        }
       } else {
         toast.error(res.data.message);
       }
@@ -85,8 +89,12 @@ const Page = () => {
       );
       if (res.data.success) {
         toast.success(res.data.message);
-        if (selectedTheaterId)
-          fetchFoodCourts(selectedTheaterId, selectedBlock || undefined);
+        if (selectedTheaterId) {
+          setFoodCourts([]);
+          setLoading(true);
+          await fetchFoodCourts(selectedTheaterId, selectedBlock || undefined);
+          setLoading(false);
+        }
       } else {
         toast.error(res.data.message);
       }

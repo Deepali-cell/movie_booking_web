@@ -14,49 +14,58 @@ const Page = () => {
     null
   );
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const res = await fetch("/api/getBookingByUserId");
-        const data: { success: boolean; bookingList: BookingType[] } =
-          await res.json();
-        if (data.success) {
-          const orders = data.bookingList
-            .filter((b) => b.foodOrder)
-            .map((b) => b.foodOrder as FoodOrderType); // type cast
-          setFoodOrders(orders);
-        }
-      } catch (err) {
-        console.error("Error fetching food orders:", err);
-      } finally {
-        setLoading(false);
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch("/api/getBookingByUserId");
+      const data: { success: boolean; bookingList: BookingType[] } =
+        await res.json();
+      if (data.success) {
+        const orders = data.bookingList
+          .filter((b) => b.foodOrder)
+          .map((b) => b.foodOrder as FoodOrderType);
+        setFoodOrders(orders);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching food orders:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchBookings();
   }, []);
 
   const cancelFoodOrder = async (foodOrderId: string) => {
     try {
-      const { data }: { data: { success: boolean; message: string } } =
-        await axios.post("/api/cancelOrder", {
-          foodOrderId,
-        });
+      const { data } = await axios.post("/api/cancelOrder", { foodOrderId });
+
       if (data.success) {
         toast.success(data.message);
-        // optionally remove the order from list
-        setFoodOrders((prev) =>
-          prev.map((order) =>
-            order._id === foodOrderId
-              ? { ...order, status: "cancelled" }
-              : order
-          )
-        );
+        fetchBookings(); // refresh the list
       } else {
         toast.error(data.message);
       }
     } catch (err) {
       console.error("🚨 Cancel order failed:", err);
       toast.error("Failed to cancel order");
+    }
+  };
+
+  const deleteFoodOrder = async (foodOrderId: string) => {
+    try {
+      const { data }: { data: { success: boolean; message: string } } =
+        await axios.post("/api/deleteOrderFood", { foodOrderId });
+
+      if (data.success) {
+        toast.success(data.message);
+        fetchBookings(); // refresh the list
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.error("🚨 Delete order failed:", err);
+      toast.error("Failed to delete order");
     }
   };
 
@@ -158,22 +167,33 @@ const Page = () => {
               </div>
             </div>
 
-            <button
-              onClick={() => setActiveFoodOrder(order)}
-              className="mt-4 w-full py-2 rounded bg-green-600 hover:bg-green-700 text-white"
-            >
-              🧾 View Bill
-            </button>
-            <Button
-              className="mt-4 w-full py-2 rounded bg-red-600 hover:bg-red-700 text-white"
-              onClick={() => {
-                if (confirm("Are you sure you want to cancel this order?")) {
-                  cancelFoodOrder(order._id);
-                }
-              }}
-            >
-              ❌ Cancel Order
-            </Button>
+            {/* Buttons area */}
+            {order.status !== "cancelled" && (
+              <button
+                onClick={() => setActiveFoodOrder(order)}
+                className="mt-4 w-full py-2 rounded bg-green-600 hover:bg-green-700 text-white"
+              >
+                🧾 View Bill
+              </button>
+            )}
+
+            {order.status !== "delivered" && order.status !== "cancelled" && (
+              <Button
+                className="mt-4 w-full py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => cancelFoodOrder(order._id)}
+              >
+                ❌ Cancel Order
+              </Button>
+            )}
+
+            {(order.status === "delivered" || order.status === "cancelled") && (
+              <Button
+                className="mt-4 w-full py-2 rounded bg-gray-700 hover:bg-gray-800 text-white"
+                onClick={() => deleteFoodOrder(order._id)}
+              >
+                🗑️ Delete Order
+              </Button>
+            )}
           </div>
         ))}
       </div>

@@ -43,6 +43,9 @@ type StateContextType = {
   setBookings: React.Dispatch<React.SetStateAction<BookingType[]>>;
   fetchBookingsList: (theaterId: string) => Promise<void>;
   uploadFile: (file: File) => Promise<string>;
+  allmovies: MovieType[];
+  setallMovies: React.Dispatch<React.SetStateAction<MovieType[]>>;
+  fetchallMovies: () => Promise<void>;
 };
 
 const StateContext = createContext<StateContextType>({
@@ -69,6 +72,9 @@ const StateContext = createContext<StateContextType>({
   setBookings: () => {},
   fetchBookingsList: async () => {},
   uploadFile: async () => "",
+  allmovies: [],
+  setallMovies: () => {},
+  fetchallMovies: async () => {},
 });
 
 export const StateContextProvider = ({ children }: { children: ReactNode }) => {
@@ -97,7 +103,20 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
   const [foodCourts, setFoodCourts] = useState<FoodCourtType[]>([]);
   const [movies, setMovies] = useState<MovieType[]>([]);
   const [bookings, setBookings] = useState<BookingType[]>([]);
+  const [allmovies, setallMovies] = useState<MovieType[]>([]);
 
+  const fetchallMovies = async () => {
+    try {
+      const { data } = await axios.get("/api/allMovies");
+      if (data.success) {
+        setallMovies(data.movies);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log("❌ Frontend error while fetching all movies:", error);
+    }
+  };
   const fetchTheatersList = async () => {
     try {
       const { data } = await axios.get("/api/owner/fetchTheatersList");
@@ -236,6 +255,9 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
         bookings,
         setBookings,
         uploadFile,
+        allmovies,
+        setallMovies,
+        fetchallMovies,
       }}
     >
       {children}

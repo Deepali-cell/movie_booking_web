@@ -42,6 +42,7 @@ export interface FoodCourtType {
     deliveryType: "in-seat" | "self-service";
     allowsAllergyNote: boolean;
     orderReviews: {
+      userId: string;
       userName: string;
       comment: string;
       rating: number;
@@ -66,6 +67,7 @@ export interface FacilityType {
 }
 
 export interface ReviewType {
+  userId: string;
   userName: string;
   comment: string;
   rating: number;
@@ -147,6 +149,7 @@ export interface MovieType {
   runtime: number;
   shorts: string[];
   movieReview?: {
+    userId: string;
     userName: string;
     comment: string;
     rating: number;
@@ -169,6 +172,7 @@ export interface ShowType {
   occupiedSeats: Record<string, boolean>;
   status: "scheduled" | "cancelled" | "completed";
   showReview: {
+    userId: string;
     userName: string;
     comment: string;
     rating: number;
@@ -203,8 +207,8 @@ export interface FoodOrderType {
 
 export interface BookingType {
   _id: string;
-  user: UserType;
-  theater: TheaterType;
+  user: UserType | string;
+  theater: TheaterType | string;
   movie: ShowType;
   seats: string[];
   totalPrice: number;
@@ -212,6 +216,7 @@ export interface BookingType {
   paymentStatus: "pending" | "paid" | "cancelled";
   createdAt: string;
   updatedAt: string;
+  groupPlan?: GroupPlanType;
 }
 
 export interface OwnerType {
@@ -220,4 +225,36 @@ export interface OwnerType {
   isActive: boolean;
   userId: Omit<UserType, "_id" | "createdAt" | "role"> & { role: "owner" };
   theaters: TheaterType[];
+}
+
+export interface GroupPlanType {
+  _id: string;
+  creator: UserType | string;
+  inviteLink: string;
+  theater: TheaterType | string;
+  invitedUsers: (UserType | string)[];
+  userSelections: {
+    user: UserType | string;
+    theaters: (TheaterType | string)[];
+    shows: (ShowType | string)[];
+    completed: boolean;
+    voted: boolean;
+  }[];
+  votes: {
+    user: UserType | string;
+    movie: ShowType | string;
+  }[];
+  finalMovie?: ShowType | string;
+  votingStarted: boolean;
+  votingEndsAt?: string;
+  dateOfShow?: string;
+  groupBooking?: BookingType | string;
+  paymentStatus: "pending" | "split" | "singlePaid" | "completed";
+  splitDetails: {
+    user: UserType | string;
+    amount: number;
+    paid: boolean;
+  }[];
+  createdAt: string;
+  updatedAt: string;
 }

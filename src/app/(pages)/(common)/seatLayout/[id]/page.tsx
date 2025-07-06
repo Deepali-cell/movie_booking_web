@@ -1,17 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import axios from "axios";
+import { ShowType } from "@/lib/types";
 
 const rowSeatCounts = [4, 6, 8, 10, 10, 8, 6, 4];
 
-const SeatLayout = () => {
-  const { id } = useParams();
+const SeatLayout: React.FC = () => {
+  const params = useParams();
+  const id = params?.id as string | undefined;
+
+  const searchParams = useSearchParams();
+  const inviteLink = searchParams.get("inviteLink");
+
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [show, setShow] = useState<any>(null);
+  const [show, setShow] = useState<ShowType | null>(null);
   const [showModal, setShowModal] = useState(false);
+
   const router = useRouter();
 
   const handleSelectSeat = (seatId: string) => {
@@ -33,15 +40,25 @@ const SeatLayout = () => {
     }
 
     try {
-      const showId = id;
-      const { data } = await axios.post(`/api/bookingMovie?${showId}`, {
+      const { data } = await axios.post<{
+        success: boolean;
+        message: string;
+        isGroupBooking?: boolean;
+        paymentMode?: string;
+      }>(`/api/bookingMovie?showId=${id}`, {
         selectedSeats,
         paymentMethod,
+        inviteLink,
       });
 
       if (data.success) {
         toast.success(data.message);
-        router.push("/myBookings");
+
+        if (data.isGroupBooking && data.paymentMode === "split") {
+          router.push(`/splitStatus/${inviteLink}`);
+        } else {
+          router.push("/myBookings");
+        }
       } else {
         toast.error(data.message);
       }
@@ -54,11 +71,16 @@ const SeatLayout = () => {
   useEffect(() => {
     const fetchShowDetails = async () => {
       try {
-        const { data } = await axios.get(`/api/getShowById?showId=${id}`);
-        if (data.success) {
+        const { data } = await axios.get<{
+          success: boolean;
+          show?: ShowType;
+          message?: string;
+        }>(`/api/getShowById?showId=${id}`);
+
+        if (data.success && data.show) {
           setShow(data.show);
         } else {
-          toast.error(data.message);
+          toast.error(data.message ?? "Show not found");
         }
       } catch (error) {
         console.error("❌ Error fetching show by ID:", error);
@@ -71,9 +93,6 @@ const SeatLayout = () => {
 
   const seatPrice = show?.showPrice || 0;
   const totalPrice = selectedSeats.length * seatPrice;
-  const showDateTime = show
-    ? `${dayjs(show.showDate).format("MMM DD, YYYY")} at ${show.showTime}`
-    : "";
 
   return (
     <div className="pt-20 min-h-screen px-4 flex flex-col items-center text-white">
@@ -84,7 +103,9 @@ const SeatLayout = () => {
           <p>
             🎬 <strong>{show.movie?.title}</strong>
           </p>
-          <p>📅 {showDateTime}</p>
+          <p>
+            📅 {dayjs(show.showDate).format("MMM DD, YYYY")} at {show.showTime}
+          </p>
           <p>💵 Price per seat: ₹{seatPrice}</p>
         </div>
       )}
@@ -102,8 +123,8 @@ const SeatLayout = () => {
 
           return (
             <div key={i} className="flex items-center justify-center gap-2">
-              {Array.from({ length: padding }).map((_, i) => (
-                <div key={`space-${i}`} className="w-10" />
+              {Array.from({ length: padding }).map((_, j) => (
+                <div key={`space-${j}`} className="w-10" />
               ))}
               {Array.from({ length: count }, (_, j) => {
                 const seatId = `${row}${j + 1}`;
@@ -116,14 +137,13 @@ const SeatLayout = () => {
                     onClick={() => handleSelectSeat(seatId)}
                     disabled={isOccupied}
                     className={`w-10 h-10 rounded-full text-sm font-semibold border transition
-    ${
-      isOccupied
-        ? "bg-red-500 border-red-600 cursor-not-allowed pointer-events-none"
-        : isSelected
-        ? "bg-yellow-400 border-yellow-500 text-black"
-        : "bg-gray-600 border-gray-400 hover:bg-yellow-300 hover:text-black"
-    }
-  `}
+                    ${
+                      isOccupied
+                        ? "bg-red-500 border-red-600 cursor-not-allowed"
+                        : isSelected
+                        ? "bg-yellow-400 border-yellow-500 text-black"
+                        : "bg-gray-600 border-gray-400 hover:bg-yellow-300 hover:text-black"
+                    }`}
                   >
                     {seatId}
                   </button>
@@ -164,9 +184,6 @@ const SeatLayout = () => {
           <div className="bg-white text-black rounded-lg p-6 w-full max-w-md">
             <h2 className="text-lg font-bold mb-4">Online Payment (Mock)</h2>
             <p>Total Amount: ₹{totalPrice}</p>
-            <p>Card Number: **** **** **** 1234</p>
-            <p>Expiry: 12/25</p>
-            <p>CVV: ***</p>
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
@@ -184,21 +201,6 @@ const SeatLayout = () => {
           </div>
         </div>
       )}
-
-      <div className="flex gap-6 text-sm mt-8 text-gray-300">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded-full bg-gray-600 border border-gray-400" />{" "}
-          Available
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-500" />{" "}
-          Selected
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded-full bg-red-500 border border-red-600" />{" "}
-          Occupied
-        </div>
-      </div>
     </div>
   );
 };

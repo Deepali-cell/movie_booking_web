@@ -6,16 +6,19 @@ import Image from "next/image";
 import CustomReview from "@/components/reviewComponents/CustomReview";
 import ShowReview from "@/components/reviewComponents/ShowReview";
 
-const FoodCourtsSection = ({ foodCourts }: { foodCourts: FoodCourtType[] }) => {
+const FoodCourtsSection = ({
+  foodCourts,
+  fetchTheaterDetails,
+}: {
+  foodCourts: FoodCourtType[];
+  fetchTheaterDetails: () => void;
+}) => {
   if (!foodCourts) return <Loading />;
   return (
     <div className="text-white">
       <h2 className="text-2xl font-bold mb-6">🍔 Food Courts</h2>
       {foodCourts.map((fc) => (
-        <div
-          key={fc._id}
-          className="bg-gray-900 rounded-2xl p-6 shadow-lg mb-10"
-        >
+        <div key={fc._id} className="bg-black rounded-2xl p-6 shadow-lg mb-10">
           {/* Header */}
           <div className="mb-4">
             <h3 className="text-xl font-semibold">{fc.name}</h3>
@@ -61,13 +64,22 @@ const FoodCourtsSection = ({ foodCourts }: { foodCourts: FoodCourtType[] }) => {
           </div>
           <div className="mt-8">
             {/* Add review form */}
-            <CustomReview type="foodcourt" id={fc._id} />
+            <CustomReview
+              type="foodcourt"
+              id={fc._id}
+              refreshReviews={fetchTheaterDetails}
+            />
 
             {/* Show reviews */}
             <h3 className="text-xl font-semibold mt-8 mb-4 text-white">
               📝 Customer Reviews
             </h3>
-            <ShowReview reviews={fc.foodService.orderReviews} />
+            <ShowReview
+              reviews={fc.foodService.orderReviews}
+              type="foodcourt"
+              id={fc._id}
+              refreshReviews={fetchTheaterDetails}
+            />
           </div>
         </div>
       ))}

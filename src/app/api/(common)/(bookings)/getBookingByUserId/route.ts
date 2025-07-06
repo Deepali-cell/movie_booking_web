@@ -6,6 +6,7 @@ import "@/models/threaterModel";
 import "@/models/blockModel";
 import "@/models/foodCourtModel";
 import "@/models/foodOrderModel";
+import "@/models/groupPlaneModel";
 import { auth } from "@clerk/nextjs/server";
 import Booking from "@/models/bookingModel";
 
@@ -20,31 +21,31 @@ export async function GET(req: NextRequest) {
   try {
     const bookingList = await Booking.find({ user: userId })
       .populate({
-        path: "movie", // Booking.movie = Show
+        path: "movie",
         model: "Show",
         populate: [
-          {
-            path: "movie", // Show.movie = Movie
-            model: "Movie",
-          },
-          {
-            path: "blockId", // Show.blockId = Block
-            model: "Block",
-            select: "name", // 👈 Just the block name
-          },
+          { path: "movie", model: "Movie" },
+          { path: "blockId", model: "Block", select: "name" },
         ],
       })
       .populate({
         path: "theater",
         model: "Theater",
-        populate: {
-          path: "foodCourts",
-          model: "FoodCourt", // ✅ your food court model name
-        },
+        populate: { path: "foodCourts", model: "FoodCourt" },
       })
       .populate({
-        path: "foodOrder", // ✅ Add this to get full food order details
+        path: "foodOrder",
         model: "FoodOrder",
+      })
+      .populate({
+        path: "groupPlan",
+        model: "GroupPlan",
+        populate: [
+          { path: "theater", model: "Theater" },
+          { path: "finalMovie", model: "Show" },
+          { path: "votes.user", model: "User" },
+          { path: "splitDetails.user", model: "User" },
+        ],
       });
 
     if (!bookingList) {

@@ -6,7 +6,7 @@ import Image from "next/image";
 import React from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { BookingType } from "@/lib/types";
+import { BookingType, GroupPlanType, ShowType, TheaterType } from "@/lib/types";
 
 interface BookingCardProps {
   b: BookingType;
@@ -21,16 +21,21 @@ const BookingCard = ({
   setActiveTicket,
   setfoodCourtGetDetail,
 }: BookingCardProps) => {
-  const movie = b.movie?.movie || {};
-  const showDetails = b.movie || {};
-  const theater = b.theater || {};
+  const theater =
+    typeof b.theater === "string" ? null : (b.theater as TheaterType);
+  const showDetails =
+    typeof b.movie === "string" ? null : (b.movie as ShowType);
+  const groupPlan =
+    typeof b.groupPlan === "string" ? null : (b.groupPlan as GroupPlanType);
 
-  const title = movie.title || "Unknown Movie";
+  const movie = showDetails?.movie;
+  const title = movie?.title ?? "Unknown Movie";
+
   const foodOrdered = !!b.foodOrder;
 
   const blockName = showDetails?.blockId?.name || "N/A";
   const theaterName = theater?.name || "Unknown Theater";
-  const theaterId = theater._id;
+  const theaterId = theater?._id;
 
   const theaterAddressText = `${theater?.location?.addressLine || ""}, ${
     theater?.location?.city || ""
@@ -69,8 +74,8 @@ const BookingCard = ({
 
   const handleCancelBooking = async () => {
     try {
-      const { data } = await axios.delete("/api/cancelBooking", {
-        data: { bookingId: b._id },
+      const { data } = await axios.patch("/api/cancelBooking", {
+        bookingId: b._id,
       });
       if (data.success) {
         toast.success(data.message);
@@ -83,13 +88,31 @@ const BookingCard = ({
     }
   };
 
+  const handleDeleteBooking = async () => {
+    try {
+      const bookingId = b._id;
+      const { data } = await axios.delete("/api/deleteBooking", {
+        data: { bookingId },
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message || "Failed to delete booking.");
+      }
+    } catch (err) {
+      console.error("Delete booking error:", err);
+      toast.error("Failed to delete booking. Try again.");
+    }
+  };
+
   return (
-    <div className="p-5 text-white">
-      <div className="flex gap-6">
+    <div className="p-5 text-white border-b border-gray-700">
+      <div className="flex gap-6 flex-wrap">
         <div className="flex flex-col gap-2">
           <h3 className="text-xl font-semibold truncate">🎬 {title}</h3>
           <Image
-            src={movie.poster_path || "/poster-placeholder.jpg"}
+            src={movie?.poster_path ?? "/poster-placeholder.jpg"}
             alt={title}
             width={200}
             height={120}
@@ -120,7 +143,7 @@ const BookingCard = ({
           <p>💵 Total: ₹{b.totalPrice}</p>
           <p>📅 Booked On: {dayjs(b.createdAt).format("MMM D, YYYY h:mm A")}</p>
           <p>
-            🕒 Show Time: {showDetails.showDate} at {showDetails.showTime}
+            🕒 Show Time: {showDetails?.showDate} at {showDetails?.showTime}
           </p>
         </div>
 
@@ -143,6 +166,41 @@ const BookingCard = ({
             </span>
           </p>
 
+          {groupPlan && (
+            <div className="bg-purple-800 p-2 rounded mt-1">
+              <p>
+                👥 <strong>Group Booking</strong>
+              </p>
+              <p>
+                💳 Payment:{" "}
+                <span className="font-semibold">{groupPlan.paymentStatus}</span>
+              </p>
+
+              {groupPlan.paymentStatus === "split" &&
+                (() => {
+                  const currentUserId =
+                    typeof b.user === "string" ? b.user : b.user._id;
+                  const userSplit = groupPlan.splitDetails?.find((s) =>
+                    typeof s.user === "string"
+                      ? s.user === currentUserId
+                      : s.user._id === currentUserId
+                  );
+
+                  return (
+                    <p className="text-sm">
+                      {userSplit?.paid
+                        ? "✅ You have paid your split."
+                        : "⚠️ You still need to pay your split."}
+                    </p>
+                  );
+                })()}
+
+              {groupPlan.paymentStatus === "singlePaid" && (
+                <p className="text-sm">Paid by group creator.</p>
+              )}
+            </div>
+          )}
+
           {showStatus !== "cancelled" ? (
             <p>
               💳 Payment:{" "}
@@ -160,12 +218,6 @@ const BookingCard = ({
                 ? "💰 Refund within 1 hour"
                 : "⚠️ No payment taken, so no refund"}
             </p>
-          )}
-
-          {b.paymentStatus === "cancelled" && (
-            <div className="text-yellow-400 font-semibold mt-2">
-              You cancelled this booking.
-            </div>
           )}
 
           {showStatus === "completed" && b.paymentStatus !== "cancelled" && (
@@ -209,6 +261,15 @@ const BookingCard = ({
                 🎟️ Show Ticket
               </button>
             </>
+          )}
+
+          {(showStatus === "completed" || b.paymentStatus === "cancelled") && (
+            <button
+              onClick={handleDeleteBooking}
+              className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 mt-1"
+            >
+              🗑️ Delete Booking
+            </button>
           )}
 
           {showStatus === "cancelled" && (

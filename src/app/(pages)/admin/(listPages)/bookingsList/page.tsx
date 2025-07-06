@@ -1,16 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BookingType } from "@/lib/types";
+import { BookingType, TheaterType } from "@/lib/types";
 
-const AdminBookingPage = () => {
+const AdminBookingPage: React.FC = () => {
   const [bookings, setBookings] = useState<BookingType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const { data } = await axios.get("/api/admin/bookingList");
+        const { data } = await axios.get<{
+          success: boolean;
+          bookingList: BookingType[];
+          message?: string;
+        }>("/api/admin/bookingList");
         if (data.success) {
           setBookings(data.bookingList);
         } else {
@@ -26,10 +30,12 @@ const AdminBookingPage = () => {
     fetchBookings();
   }, []);
 
-  const formatLocation = (location: any) => {
+  const formatLocation = (location?: TheaterType["location"]) => {
     if (!location) return "N/A";
     const { addressLine, city, state, country, pincode, landmarks } = location;
-    return `${addressLine}, ${city}, ${state}, ${country} - ${pincode}${
+    return `${addressLine ?? ""}, ${city ?? ""}, ${state ?? ""}, ${
+      country ?? ""
+    } - ${pincode ?? ""}${
       landmarks?.length ? " (Landmarks: " + landmarks.join(", ") + ")" : ""
     }`;
   };
@@ -53,8 +59,14 @@ const AdminBookingPage = () => {
               </h3>
 
               <p>
-                👤 <strong>User:</strong> {booking.user?.name} (
-                {booking.user?.email})
+                👤 <strong>User:</strong>{" "}
+                {typeof booking.user !== "string" ? (
+                  <>
+                    {booking.user?.name} ({booking.user?.email})
+                  </>
+                ) : (
+                  booking.user
+                )}
               </p>
 
               <p>
@@ -62,12 +74,17 @@ const AdminBookingPage = () => {
               </p>
 
               <p>
-                🏢 <strong>Theater:</strong> {booking.theater?.name}
+                🏢 <strong>Theater:</strong>{" "}
+                {typeof booking.theater !== "string"
+                  ? booking.theater?.name
+                  : booking.theater}
               </p>
 
               <p>
                 📍 <strong>Location:</strong>{" "}
-                {formatLocation(booking.theater?.location)}
+                {typeof booking.theater !== "string"
+                  ? formatLocation(booking.theater?.location)
+                  : "N/A"}
               </p>
 
               <p>

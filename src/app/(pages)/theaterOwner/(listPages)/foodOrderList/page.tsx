@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useStateContext } from "@/context/StateContextProvider";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,38 +10,39 @@ const Page = () => {
   const [selectedFoodCourt, setSelectedFoodCourt] = useState<string | null>(
     null
   );
-
   const [orders, setOrders] = useState<FoodOrderType[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Get the selected food court details for block & floor
+  // Get selected food court details
   const selectedFoodCourtDetails = theaterList
     ?.flatMap((theater) => theater.foodCourts || [])
     .find((fc) => fc._id === selectedFoodCourt);
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!selectedFoodCourt) return;
-      try {
-        setLoading(true);
-        const { data } = await axios.get(
-          `/api/owner/fetchOrderByFoodCourtId?foodCourtId=${selectedFoodCourt}`
-        );
-        if (data.success) {
-          setOrders(data.orders);
-        } else {
-          toast.error(data.message);
-        }
-      } catch (error) {
-        console.log("frontend error while fetching orders", error);
-        toast.error("Error fetching orders");
-      } finally {
-        setLoading(false);
+
+  const fetchOrders = useCallback(async () => {
+    if (!selectedFoodCourt) return;
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `/api/owner/fetchOrderByFoodCourtId?foodCourtId=${selectedFoodCourt}`
+      );
+      if (data.success) {
+        setOrders(data.orders);
+      } else {
+        toast.error(data.message);
       }
-    };
+    } catch (error) {
+      console.log("frontend error while fetching orders", error);
+      toast.error("Error fetching orders");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedFoodCourt]); // ✅ add selectedFoodCourt here
 
+  useEffect(() => {
     if (selectedFoodCourt) fetchOrders();
-  }, [selectedFoodCourt]);
+  }, [selectedFoodCourt, fetchOrders]);
 
+  // 🛠️ Updated updateStatus to refetch orders
   const updateStatus = async (orderId: string, newStatus: string) => {
     try {
       const { data } = await axios.put(`/api/owner/updateOrderStatus`, {
@@ -50,7 +51,7 @@ const Page = () => {
       });
       if (data.success) {
         toast.success("Status updated!");
-        setOrders(data.orders);
+        await fetchOrders(); // ✅ refetch latest orders
       } else {
         toast.error(data.message);
       }

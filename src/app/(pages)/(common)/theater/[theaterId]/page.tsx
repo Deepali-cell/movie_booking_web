@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import TheaterInfo from "@/components/common/sections/TheaterInfo";
@@ -15,29 +15,29 @@ const Page = () => {
   const theaterId = params.theaterId as string;
   const [detail, setDetail] = useState<any>();
   const [activeTab, setActiveTab] = useState<
-    "overview" | "movies" | "shows" | "foodcourts"
+    "overview" | "shows" | "foodcourts"
   >("overview");
 
-  useEffect(() => {
-    const fetchTheaterDetails = async () => {
-      try {
-        const { data } = await axios.get(
-          `/api/getTheater?theaterId=${theaterId}`
-        );
-        if (data.success) {
-          setDetail(data.theater);
-        } else {
-          toast.error(data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching theater details:", error);
+  const fetchTheaterDetails = useCallback(async () => {
+    try {
+      const { data } = await axios.get(
+        `/api/getTheater?theaterId=${theaterId}`
+      );
+      if (data.success) {
+        setDetail(data.theater);
+      } else {
+        toast.error(data.message);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching theater details:", error);
+    }
+  }, [theaterId]);
 
+  useEffect(() => {
     if (theaterId) {
       fetchTheaterDetails();
     }
-  }, [theaterId]);
+  }, [theaterId, fetchTheaterDetails]);
 
   if (!detail) return <Loading />;
 
@@ -47,15 +47,24 @@ const Page = () => {
       <div className="flex">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <div className="flex-1 ml-6">
-          {activeTab === "overview" && <TheaterInfo theater={detail} />}
-          {activeTab === "movies" && (
-            <MoviesSection movies={detail.allMovies} />
+          {activeTab === "overview" && (
+            <TheaterInfo
+              theater={detail}
+              fetchTheaterDetails={fetchTheaterDetails}
+            />
           )}
+
           {activeTab === "shows" && (
-            <ShowsSection shows={detail.moviesPlaying} />
+            <ShowsSection
+              shows={detail.moviesPlaying}
+              fetchTheaterDetails={fetchTheaterDetails}
+            />
           )}
           {activeTab === "foodcourts" && (
-            <FoodCourtsSection foodCourts={detail.foodCourts} />
+            <FoodCourtsSection
+              foodCourts={detail.foodCourts}
+              fetchTheaterDetails={fetchTheaterDetails}
+            />
           )}
         </div>
       </div>

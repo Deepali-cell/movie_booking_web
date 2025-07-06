@@ -25,12 +25,54 @@ const Ticket: React.FC<Props> = ({ activeTicket, setActiveTicket }) => {
     }
   };
 
+  // 🔥 New helper to get payment status based on group plans
+  const getTicketStatus = () => {
+    if (activeTicket.groupPlan) {
+      if (activeTicket.groupPlan.paymentStatus === "singlePaid") {
+        return { valid: true, message: "✅ Paid by group creator" };
+      }
+
+      if (activeTicket.groupPlan.paymentStatus === "split") {
+        const currentUserId =
+          typeof activeTicket.user === "string"
+            ? activeTicket.user
+            : activeTicket.user?._id?.toString();
+
+        const userSplit = activeTicket.groupPlan.splitDetails?.find(
+          (s) => s.user?.toString() === currentUserId
+        );
+
+        if (userSplit?.paid) {
+          return { valid: true, message: "✅ You paid your split" };
+        } else {
+          return {
+            valid: false,
+            message: "⚠️ You still need to pay your split",
+          };
+        }
+      }
+    }
+
+    // fallback to normal
+    return {
+      valid: activeTicket.paymentStatus === "paid",
+      message:
+        activeTicket.paymentStatus === "paid"
+          ? "✅ Confirmed"
+          : activeTicket.paymentStatus === "pending"
+          ? "🕒 Pending"
+          : "❌ Cancelled",
+    };
+  };
+
+  const ticketStatus = getTicketStatus();
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center px-4">
       <div className="bg-white text-black p-6 rounded-xl w-full max-w-md shadow-2xl">
         <h3 className="text-2xl font-bold mb-4 text-center">
-          {activeTicket.paymentStatus === "paid"
-            ? "🎫 Your Permanent Ticket"
+          {ticketStatus.valid
+            ? "🎫 Your Valid Ticket"
             : "🕐 Temporary Ticket (Pending)"}
         </h3>
 
@@ -62,22 +104,65 @@ const Ticket: React.FC<Props> = ({ activeTicket, setActiveTicket }) => {
             {dayjs(activeTicket.createdAt).format("MMM D, YYYY h:mm A")}
           </p>
           <p>
-            <strong>Status:</strong>{" "}
-            {activeTicket.paymentStatus === "paid"
-              ? "✅ Confirmed"
-              : activeTicket.paymentStatus === "pending"
-              ? "🕒 Pending"
-              : "❌ Cancelled"}
+            <strong>Status:</strong> {ticketStatus.message}
           </p>
 
-          {activeTicket.paymentStatus !== "paid" ? (
-            <p style={{ color: "#d32f2f", marginTop: "10px" }}>
-              ⚠️ Not valid until paid.
-            </p>
-          ) : (
+          {ticketStatus.valid ? (
             <p style={{ color: "#2e7d32", marginTop: "10px" }}>
               ✅ Valid Ticket – Issued.
             </p>
+          ) : (
+            <p style={{ color: "#d32f2f", marginTop: "10px" }}>
+              ⚠️ Not valid until paid.
+            </p>
+          )}
+
+          {activeTicket.groupPlan && (
+            <div
+              style={{
+                marginTop: "10px",
+                padding: "10px",
+                border: "1px solid #666",
+                borderRadius: "8px",
+                backgroundColor: "#f9f9f9",
+              }}
+            >
+              <p style={{ fontWeight: "bold" }}>👥 Group Booking Details:</p>
+              <p>
+                <strong>Invite Link:</strong>{" "}
+                {activeTicket.groupPlan.inviteLink}
+              </p>
+              <p>
+                <strong>Payment Type:</strong>{" "}
+                {activeTicket.groupPlan.paymentStatus}
+              </p>
+
+              {activeTicket.groupPlan.paymentStatus === "singlePaid" && (
+                <p>💰 Paid by group creator.</p>
+              )}
+
+              {activeTicket.groupPlan.paymentStatus === "split" &&
+                (() => {
+                  const currentUserId =
+                    typeof activeTicket.user === "string"
+                      ? activeTicket.user
+                      : activeTicket.user?._id?.toString();
+
+                  const userSplit = activeTicket.groupPlan.splitDetails?.find(
+                    (s) =>
+                      typeof s.user === "string"
+                        ? s.user === currentUserId
+                        : s.user._id === currentUserId
+                  );
+
+                  return (
+                    <p>
+                      💸 Split: ₹{userSplit?.amount} -{" "}
+                      {userSplit?.paid ? "✅ Paid" : "⚠️ Not paid"}
+                    </p>
+                  );
+                })()}
+            </div>
           )}
         </div>
 
@@ -89,7 +174,7 @@ const Ticket: React.FC<Props> = ({ activeTicket, setActiveTicket }) => {
             Close
           </button>
 
-          {activeTicket.paymentStatus === "paid" && (
+          {ticketStatus.valid && (
             <button
               onClick={handleDownloadPNG}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

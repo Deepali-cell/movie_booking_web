@@ -3,27 +3,15 @@
 import CustomReview from "@/components/reviewComponents/CustomReview";
 import ShowReview from "@/components/reviewComponents/ShowReview";
 import { TheaterType } from "@/lib/types";
-import axios from "axios";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
 
-const TheaterInfo = ({ theater }: { theater: TheaterType }) => {
-  const [reviews, setReviews] = useState([]);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await axios.get(
-          `/api/review/getReview?type=theater&id=${theater._id}`
-        );
-        setReviews(res.data.reviews);
-      } catch (err) {
-        console.error("Failed to load reviews", err);
-      }
-    };
-
-    fetchReviews();
-  }, [theater._id]);
+const TheaterInfo = ({
+  theater,
+  fetchTheaterDetails,
+}: {
+  theater: TheaterType;
+  fetchTheaterDetails: () => void;
+}) => {
   return (
     <div className="bg-black rounded-2xl shadow-lg text-white p-6 max-w-5xl mx-auto my-6">
       <div className="mb-4">
@@ -181,9 +169,21 @@ const TheaterInfo = ({ theater }: { theater: TheaterType }) => {
         ))}
 
         <div className="mt-6 text-sm">
-          <CustomReview type="theater" id={theater._id} />
+          <CustomReview
+            type="theater"
+            id={theater._id}
+            refreshReviews={fetchTheaterDetails}
+          />
 
-          <ShowReview reviews={theater.reviews} />
+          <h3 className="text-xl font-semibold mt-8 mb-4 text-white">
+            📝 Customer Reviews
+          </h3>
+          <ShowReview
+            reviews={theater.reviews}
+            type="theater"
+            id={theater._id}
+            refreshReviews={fetchTheaterDetails}
+          />
         </div>
       </div>
     </div>

@@ -15,6 +15,7 @@ const Navbar = () => {
   const navItems = [
     { name: "Home", path: "/" },
     { name: "Theaters", path: "/allTheaters" },
+    { name: "Latest Movies", path: "/allMovies" },
   ];
 
   // 👇 Add dashboard link based on role
@@ -23,7 +24,7 @@ const Navbar = () => {
   } else if (role === "owner") {
     navItems.push({ name: "Owner Dashboard", path: "/theaterOwner/dashboard" });
   } else if (role === "user") {
-    navItems.push({ name: "Group Plan", path: "/groupPlan" });
+    navItems.push({ name: "Group Plan", path: "/groupCreate" });
   }
   if (isSignedIn) {
     navItems.push({ name: "Favourites", path: "/favourites" });

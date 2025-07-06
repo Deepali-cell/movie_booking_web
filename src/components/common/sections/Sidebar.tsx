@@ -3,7 +3,6 @@ import React from "react";
 
 const tabs = [
   { id: "overview", label: "🎭 Overview" },
-  { id: "movies", label: "🎬 Movies" },
   { id: "shows", label: "🕒 Shows" },
   { id: "foodcourts", label: "🍔 Food Courts" },
 ];

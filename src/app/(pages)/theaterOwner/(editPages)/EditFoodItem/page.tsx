@@ -1,4 +1,4 @@
-import EditFoodItem from "@/components/ownerComponents/addcomponents/EditFoodItem";
+import EditFoodItem from "@/components/ownerComponents/EditFoodItem";
 import React, { Suspense } from "react";
 
 export default function Page() {

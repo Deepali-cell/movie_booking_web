@@ -5,6 +5,17 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+// ✅ type guards
+function isPopulatedUser(user: any): user is { name: string; email: string } {
+  return user && typeof user === "object" && "name" in user && "email" in user;
+}
+
+function isPopulatedTheater(
+  theater: any
+): theater is { name: string; location?: any } {
+  return theater && typeof theater === "object" && "name" in theater;
+}
+
 const Page = () => {
   const { theaterList, fetchBookingsList, bookings, selectedTheaterId } =
     useStateContext();
@@ -13,7 +24,9 @@ const Page = () => {
   const formatLocation = (location: any) => {
     if (!location) return "N/A";
     const { addressLine, city, state, country, pincode, landmarks } = location;
-    return `${addressLine}, ${city}, ${state}, ${country} - ${pincode}${
+    return `${addressLine ?? ""}, ${city ?? ""}, ${state ?? ""}, ${
+      country ?? ""
+    } - ${pincode ?? ""}${
       landmarks?.length ? " (Landmarks: " + landmarks.join(", ") + ")" : ""
     }`;
   };
@@ -30,7 +43,6 @@ const Page = () => {
     }
   };
 
-  // ✅ Handle payment status update
   const updatePaymentStatus = async (bookingId: string, newStatus: string) => {
     try {
       const { data } = await axios.put("/api/owner/updateBookingStatus", {
@@ -39,13 +51,18 @@ const Page = () => {
       });
       if (data.success) {
         toast.success("Payment status updated!");
-        handleFetchBookings(selectedTheaterId as string); // refresh bookings
+        setLoading(true);
+        if (selectedTheaterId) {
+          await fetchBookingsList(selectedTheaterId);
+        }
       } else {
         toast.error(data.message || "Update failed");
       }
     } catch (err) {
       console.error("Failed to update payment status:", err);
       toast.error("Error updating status");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,8 +123,10 @@ const Page = () => {
               </h3>
 
               <p>
-                👤 <strong>User:</strong> {booking.user?.name} (
-                {booking.user?.email})
+                👤 <strong>User:</strong>{" "}
+                {isPopulatedUser(booking.user)
+                  ? `${booking.user.name} (${booking.user.email})`
+                  : booking.user}
               </p>
 
               <p>
@@ -115,12 +134,17 @@ const Page = () => {
               </p>
 
               <p>
-                🏢 <strong>Theater:</strong> {booking.theater?.name}
+                🏢 <strong>Theater:</strong>{" "}
+                {isPopulatedTheater(booking.theater)
+                  ? booking.theater.name
+                  : booking.theater}
               </p>
 
               <p>
                 📍 <strong>Location:</strong>{" "}
-                {formatLocation(booking.theater?.location)}
+                {isPopulatedTheater(booking.theater)
+                  ? formatLocation(booking.theater.location)
+                  : "N/A"}
               </p>
 
               <p>

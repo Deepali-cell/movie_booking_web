@@ -1,11 +1,17 @@
 import ConnectDb from "@/lib/ConnectDb";
 import Booking from "@/models/bookingModel";
-import FoodOrder from "@/models/foodOrderModel";
 import Show from "@/models/showModel";
+import FoodOrder from "@/models/foodOrderModel";
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-export async function DELETE(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   await ConnectDb();
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const body = await req.json();
@@ -27,7 +33,15 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // 🔥 2. Update Show to remove these seats
+    // 🔥 2. Check if already cancelled
+    if (booking.paymentStatus === "cancelled") {
+      return NextResponse.json({
+        success: false,
+        message: "Booking already cancelled.",
+      });
+    }
+
+    // 🔥 3. Release seats
     if (booking.movie && booking.seats.length > 0) {
       const show = await Show.findById(booking.movie);
       if (show) {
@@ -39,17 +53,19 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
-    // 🔥 3. Delete associated food order
+    // 🔥 4. Cancel food order if exists
     if (booking.foodOrder) {
       await FoodOrder.findByIdAndDelete(booking.foodOrder);
+      booking.foodOrder = null;
     }
 
-    // 🔥 4. Finally delete the booking itself
-    await booking.deleteOne();
+    // 🔥 5. Mark booking as cancelled
+    booking.paymentStatus = "cancelled";
+    await booking.save();
 
     return NextResponse.json({
       success: true,
-      message: "Booking cancelled, seats released, food order deleted.",
+      message: "Booking cancelled. Seats released & food order removed.",
     });
   } catch (err) {
     console.error("❌ Cancel Booking Error:", err);

@@ -14,7 +14,7 @@ export const movieSchema = new mongoose.Schema(
     vote_average: { type: Number, required: true },
     vote_count: { type: Number, required: true },
     runtime: { type: Number, required: true },
-    shorts: { type: [{ type: String, default: "" }], default: [] },
+    shorts: { type: [{ type: String }], default: [] },
     movieReview: {
       type: [
         {
@@ -32,5 +32,4 @@ export const movieSchema = new mongoose.Schema(
 );
 
 const Movie = mongoose.models.Movie || mongoose.model("Movie", movieSchema);
-
 export default Movie;
