@@ -20,8 +20,15 @@ export default function SelectTheaterPage() {
         const { data } = await axios.get(
           `/api/groupData?inviteLink=${inviteLink}`
         );
-        if (data.alreadySelected) {
+        if (data.hasSelectedShows) {
           router.replace(`/summary/${inviteLink}`);
+        } else if (data.hasSelectedTheaters) {
+          router.replace(
+            `/selectShowsPage/${inviteLink}?theaters=${data.group.userSelections
+              .find((u: any) => u.user._id === data.currentUser)
+              ?.theaters.map((t: any) => t._id)
+              .join(",")}`
+          );
         }
       } catch (err) {
         console.error(err);

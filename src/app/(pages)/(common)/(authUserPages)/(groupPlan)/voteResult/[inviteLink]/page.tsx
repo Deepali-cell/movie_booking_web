@@ -68,6 +68,14 @@ export default function ResultPage() {
       toast.error("Failed to set payment mode");
     }
   };
+  useEffect(() => {
+    if (
+      !loading &&
+      ["split", "singlePaid", "completed"].includes(paymentStatus)
+    ) {
+      router.replace(`/splitStatus/${inviteLink}`);
+    }
+  }, [loading, paymentStatus, router, inviteLink]);
 
   if (loading) {
     return (

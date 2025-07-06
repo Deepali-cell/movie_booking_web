@@ -20,7 +20,6 @@ export default function GroupPage() {
   const [group, setGroup] = useState<GroupPlanType>();
   const [showShareOptions, setShowShareOptions] = useState(false);
   const router = useRouter();
-
   useEffect(() => {
     const fetchGroup = async () => {
       try {
@@ -33,21 +32,38 @@ export default function GroupPage() {
           return;
         }
 
-        if (
-          data.group.finalMovie ||
-          ["split", "singlePaid", "completed"].includes(
-            data.group.paymentStatus
-          )
-        ) {
-          router.push(`/splitStatus/${inviteLink}`);
+        // 🔥 smart redirect flow
+        if (data.group.finalMovie) {
+          if (
+            ["split", "singlePaid", "completed"].includes(
+              data.group.paymentStatus
+            )
+          ) {
+            router.push(`/splitStatus/${inviteLink}`);
+          } else {
+            router.push(`/voteResult/${inviteLink}`);
+          }
         } else {
-          setGroup(data.group); // 👈 ye zaroori hai taaki page render ho
+          if (data.allSelected) {
+            if (data.group.paymentStatus === "pending") {
+              router.push(`/summary/${inviteLink}`);
+            } else if (
+              ["split", "singlePaid", "completed"].includes(
+                data.group.paymentStatus
+              )
+            ) {
+              router.push(`/splitStatus/${inviteLink}`);
+            }
+          }
         }
+
+        setGroup(data.group); // page data load karne ke liye
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch group data");
       }
     };
+
     fetchGroup();
   }, [inviteLink, router]);
 

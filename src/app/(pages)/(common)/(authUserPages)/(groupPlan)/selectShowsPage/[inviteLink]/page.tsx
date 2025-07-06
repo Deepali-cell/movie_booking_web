@@ -26,7 +26,7 @@ export default function SelectShowsPage() {
         const { data } = await axios.get(
           `/api/groupData?inviteLink=${inviteLink}`
         );
-        if (data.alreadySelected) {
+        if (data.hasSelectedShows) {
           router.replace(`/summary/${inviteLink}`);
         }
       } catch (err) {

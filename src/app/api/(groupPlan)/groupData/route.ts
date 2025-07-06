@@ -70,12 +70,11 @@ export async function GET(req: NextRequest) {
     }
 
     const userSelection = group.userSelections.find(
-      (sel: any) =>
-        sel.user._id.toString() === userId &&
-        sel.theaters.length > 0 &&
-        sel.shows.length > 0
+      (sel: any) => sel.user._id.toString() === userId
     );
 
+    const hasSelectedTheaters = userSelection?.theaters?.length > 0;
+    const hasSelectedShows = userSelection?.shows?.length > 0;
     const allSelected = group.userSelections.every(
       (sel: any) => sel.theaters.length > 0 && sel.shows.length > 0
     );
@@ -83,9 +82,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       group,
-      alreadySelected: !!userSelection,
       currentUser: userId,
-      allSelected,
+      alreadySelected: hasSelectedShows && hasSelectedTheaters,
+      hasSelectedTheaters,
+      hasSelectedShows,
+      allSelected, // 👈 add kiya
       isCreator: group.creator._id === userId,
     });
   } catch (err) {
