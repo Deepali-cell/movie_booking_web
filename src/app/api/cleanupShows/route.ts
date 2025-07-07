@@ -2,16 +2,24 @@ import ConnectDb from "@/lib/ConnectDb";
 import Block from "@/models/blockModel";
 import Show from "@/models/showModel";
 import Theater from "@/models/threaterModel";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-// /app/api/cleanupShows/route.ts
 export const dynamic = "force-dynamic";
-export async function GET() {
+
+export async function GET(req: NextRequest) {
+  // 🔒 Check Authorization header
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   await ConnectDb();
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
 
-  // Scheduled -> completed
   const scheduled = await Show.find({ status: "scheduled" });
   for (const show of scheduled) {
     if (new Date(`${show.showDate}T${show.showTime}:00`) < now) {
@@ -22,7 +30,6 @@ export async function GET() {
     }
   }
 
-  // Old delete
   const expired = await Show.find({ showDate: { $lt: todayStr } });
   for (const show of expired) {
     await Block.updateOne(
