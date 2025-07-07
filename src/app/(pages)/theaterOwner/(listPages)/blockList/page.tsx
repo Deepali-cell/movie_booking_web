@@ -16,7 +16,6 @@ const BlockList = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
   useEffect(() => {
     const loadBlocks = async () => {
       if (selectedTheaterId) {
@@ -26,7 +25,7 @@ const BlockList = () => {
       }
     };
     loadBlocks();
-  }, [selectedTheaterId]);
+  }, [selectedTheaterId, fetchBlocks]);
 
   const handleDelete = async (blockId: string) => {
     try {
