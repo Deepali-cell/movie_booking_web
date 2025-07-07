@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Loading from "../Loading";
 import { ShowType } from "@/lib/types";
 import ShowCard from "../card/ShowCard";
-import axios from "axios";
 
 const ShowsSection = ({
   shows,
@@ -12,18 +11,6 @@ const ShowsSection = ({
   shows: ShowType[];
   fetchTheaterDetails: () => void;
 }) => {
-  useEffect(() => {
-    const runCleanup = async () => {
-      try {
-        await axios.get("/api/cleanupShows");
-        console.log("✅ Cleanup done from ShowsSection");
-      } catch (err) {
-        console.error("Cleanup error:", err);
-      }
-    };
-
-    runCleanup();
-  }, []);
   if (!shows) return <Loading />;
 
   return (

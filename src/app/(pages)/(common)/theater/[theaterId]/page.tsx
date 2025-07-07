@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import TheaterInfo from "@/components/common/sections/TheaterInfo";
@@ -32,23 +32,6 @@ const Page = () => {
       console.error("Error fetching theater details:", error);
     }
   }, [theaterId]);
-
-  // ✅ Page load pe cleanup + theater data
-  useEffect(() => {
-    const runCleanup = async () => {
-      try {
-        await axios.get("/api/cleanupShows");
-        console.log("✅ Cleanup done");
-      } catch (err) {
-        console.error("Cleanup error:", err);
-      }
-    };
-
-    if (theaterId) {
-      runCleanup();
-      fetchTheaterDetails();
-    }
-  }, [theaterId, fetchTheaterDetails]);
 
   if (!detail) return <Loading />;
 

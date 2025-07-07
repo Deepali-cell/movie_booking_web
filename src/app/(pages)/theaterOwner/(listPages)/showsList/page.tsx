@@ -1,28 +1,14 @@
 "use client";
-import React, { useEffect } from "react";
+
 import ShowCard from "@/components/ownerComponents/cardComponents/ShowCard";
 import { useStateContext } from "@/context/StateContextProvider";
 import { useGetShowsQuery } from "@/app/serveces/app";
 import { ShowType } from "@/lib/types";
-import axios from "axios";
 
 const Page = () => {
   const { theaterList, blocks, fetchBlocks, selectedTheaterId } =
     useStateContext();
 
-  // ✅ on page load: cleanup API call
-  useEffect(() => {
-    const runCleanup = async () => {
-      try {
-        await axios.get("/api/cleanupShows");
-        console.log("✅ Cleanup done on shows page");
-      } catch (err) {
-        console.error("Cleanup error:", err);
-      }
-    };
-
-    runCleanup();
-  }, []);
   const { data, isLoading, refetch } = useGetShowsQuery(selectedTheaterId!, {
     skip: !selectedTheaterId,
   });
