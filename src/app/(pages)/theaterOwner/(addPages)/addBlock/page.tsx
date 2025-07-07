@@ -1,18 +1,22 @@
 "use client";
 
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { useStateContext } from "@/context/StateContextProvider";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TheaterType } from "@/lib/types";
+import {
+  useGetTheatersQuery,
+  useAddBlockMutation,
+} from "@/app/serveces/theaterApi";
 
 const AddBlock = () => {
-  const { theaterList } = useStateContext();
   const router = useRouter();
+  const { data, isLoading } = useGetTheatersQuery();
+  const [addBlock, { isLoading: isAdding }] = useAddBlockMutation();
+
   const [formData, setFormData] = useState({
     name: "",
     screen: "",
@@ -29,19 +33,16 @@ const AddBlock = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("/api/owner/addNewBlock", formData);
-
-      if (data.success) {
-        toast.success(data.message);
-        router.push("/theaterOwner/theatersList");
-      } else {
-        toast.error(data.message);
-      }
+      const res = await addBlock(formData).unwrap();
+      toast.success(res.message || "Block added successfully");
+      router.push("/theaterOwner/theatersList");
     } catch (err) {
       console.error("❌ Submit failed:", err);
       toast.error("Something went wrong");
     }
   };
+
+  const theaterList: TheaterType[] = data?.theaters || [];
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -80,15 +81,21 @@ const AddBlock = () => {
             className="w-full border px-3 py-2 rounded"
           >
             <option value="">Select Theater</option>
-            {theaterList.map((theater: TheaterType) => (
-              <option key={theater._id} value={theater._id}>
-                {theater.name}
-              </option>
-            ))}
+            {isLoading ? (
+              <option>Loading theaters...</option>
+            ) : (
+              theaterList.map((theater) => (
+                <option key={theater._id} value={theater._id}>
+                  {theater.name}
+                </option>
+              ))
+            )}
           </select>
         </div>
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isAdding}>
+          {isAdding ? "Adding..." : "Submit"}
+        </Button>
       </form>
     </div>
   );

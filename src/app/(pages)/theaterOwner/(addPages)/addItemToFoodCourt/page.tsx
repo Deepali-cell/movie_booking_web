@@ -134,7 +134,8 @@ const Page = () => {
           <Image
             src={formData.image}
             alt="Preview"
-            fill
+            height={200}
+            width={200}
             className="object-cover rounded"
           />
         )}

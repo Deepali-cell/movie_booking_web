@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "🎉 Theater created successfully!",
-      data: newTheater,
+      theaters: newTheater,
     });
   } catch (error) {
     console.error("🚨 Error creating theater:", error);

@@ -1,16 +1,19 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import TheaterForm from "@/components/ownerComponents/commonComponentsOfOwner/TheaterForm";
 import { TheaterType } from "@/lib/types";
+import { useEditTheaterMutation } from "@/app/serveces/theaterApi";
+import axios from "axios";
 
 const EditTheaterPage = () => {
   const params = useParams();
   const theaterId = params?.theaterId as string;
-  const [initialData, setInitialData] = useState<TheaterType>();
   const router = useRouter();
+  const [initialData, setInitialData] = useState<TheaterType>();
+  const [editTheater, { isLoading: isUpdating }] = useEditTheaterMutation();
 
   useEffect(() => {
     if (!theaterId) return;
@@ -24,7 +27,7 @@ const EditTheaterPage = () => {
         } else {
           toast.error(data.message);
         }
-      } catch (err: unknown) {
+      } catch (err) {
         toast.error("Failed to fetch theater data");
       }
     };
@@ -33,17 +36,11 @@ const EditTheaterPage = () => {
 
   const handleEdit = async (formData: any) => {
     try {
-      const { data } = await axios.put(
-        `/api/owner/editTheater?theaterId=${theaterId}`,
-        formData
-      );
-      if (data.success) {
-        toast.success(data.message);
-        router.push("/theaterOwner/theatersList");
-      } else {
-        toast.error(data.message);
-      }
+      await editTheater({ theaterId, ...formData }).unwrap();
+      toast.success("Updated theater successfully");
+      router.push("/theaterOwner/theatersList");
     } catch (err) {
+      console.error(err);
       toast.error("❌ Update failed");
     }
   };

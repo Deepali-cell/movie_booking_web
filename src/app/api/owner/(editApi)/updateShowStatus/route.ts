@@ -1,8 +1,6 @@
 import ConnectDb from "@/lib/ConnectDb";
 import Show from "@/models/showModel";
-import Block from "@/models/blockModel";
 import { NextRequest, NextResponse } from "next/server";
-import Theater from "@/models/threaterModel";
 
 export async function PATCH(req: NextRequest) {
   await ConnectDb();
@@ -17,7 +15,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // 1. Find the show
+    // Find and update show status
     const show = await Show.findById(showId);
     if (!show) {
       return NextResponse.json(
@@ -26,31 +24,12 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // 2. Update show status
     show.status = newStatus;
     await show.save();
 
-    // 3. If status is cancelled, remove from Theater.moviesPlaying and Block.movies
-    if (newStatus === "cancelled") {
-      const block = await Block.findById(show.blockId);
-      if (block) {
-        await Theater.updateOne(
-          { _id: block.theaterId },
-          { $pull: { moviesPlaying: show._id } }
-        );
-
-        await Block.updateOne(
-          { _id: block._id },
-          { $pull: { movies: show._id } }
-        );
-      }
-    }
-
     return NextResponse.json({
       success: true,
-      message: `Show updated to ${newStatus}${
-        newStatus === "cancelled" ? " and removed from theater & block" : ""
-      }`,
+      message: `Show status updated to ${newStatus}`,
     });
   } catch (err) {
     console.error("Error updating show:", err);

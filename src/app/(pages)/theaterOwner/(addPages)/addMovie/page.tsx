@@ -1,12 +1,11 @@
 "use client";
-
 import React, { useState, FormEvent } from "react";
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useStateContext } from "@/context/StateContextProvider";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { MovieFormType } from "@/lib/types";
 import MovieForm from "@/components/ownerComponents/commonComponentsOfOwner/MovieForm";
+import { useAddMovieMutation } from "@/app/serveces/movieApi";
 
 const AddMovie = () => {
   const [formData, setFormData] = useState<MovieFormType>({
@@ -24,34 +23,25 @@ const AddMovie = () => {
     runtime: 0,
     shorts: [],
   });
-
   const { theaterList, uploadFile } = useStateContext();
   const [selectedTheaterId, setSelectedTheaterId] = useState("");
+  const [addMovie] = useAddMovieMutation();
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (!selectedTheaterId) {
-      toast.error("Please select a theater");
-      return;
-    }
+    if (!selectedTheaterId) return toast.error("Please select a theater");
 
     try {
-      const { data } = await axios.post("/api/owner/addNewMovie", {
+      await addMovie({
         ...formData,
         theaterId: selectedTheaterId,
-      });
-
-      if (data.success) {
-        toast.success(data.message);
-        router.push("/theaterOwner/moviesList");
-      } else {
-        toast.error(data.message);
-      }
+      }).unwrap();
+      toast.success("Movie added successfully!");
+      router.push("/theaterOwner/moviesList");
     } catch (err) {
-      console.error("❌ Submit failed:", err);
-      toast.error("Something went wrong");
+      toast.error("Failed to add movie");
+      console.error(err);
     }
   };
 

@@ -55,6 +55,7 @@ export async function DELETE(req: NextRequest) {
       success: true,
       message:
         "✅ Movie deleted, removed from theaters, and related shows cancelled",
+      movies: deletedMovie,
     });
   } catch (error: any) {
     console.error("❌ Error deleting movie:", error);

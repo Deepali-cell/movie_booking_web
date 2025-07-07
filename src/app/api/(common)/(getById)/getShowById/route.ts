@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Show from "@/models/showModel";
 import "@/models/movieModel";
 import "@/models/blockModel";
+import "@/models/threaterModel";
 
 export async function GET(req: NextRequest) {
   await ConnectDb();
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
       })
       .populate({
         path: "blockId",
-        select: "name screen",
+        select: "name screen theaterId", // ⬅️ include theaterId
       });
 
     if (!show) {
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Show found successfully",
-      show, // <-- Return full show
+      show,
     });
   } catch (error: any) {
     console.error("🚨 Error fetching show by id:", error.message);

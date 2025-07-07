@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { ShowType } from "@/lib/types";
+import { useDeleteShowMutation, useUpdateShowStatusMutation } from "@/app/serveces/app";
+
 
 interface Props {
   show: ShowType;
@@ -13,26 +14,15 @@ interface Props {
 
 const ShowCard: React.FC<Props> = ({ show, onUpdate }) => {
   const router = useRouter();
+  const [deleteShow] = useDeleteShowMutation();
+  const [updateShowStatus] = useUpdateShowStatusMutation();
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this show?"
-    );
-    if (!confirmed) return;
-
     try {
-      const { data } = await axios.delete(
-        `/api/owner/deleteShow?showId=${show._id}`
-      );
-
-      if (data.success) {
-        toast.success("✅ Show deleted successfully");
-        onUpdate?.();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.error("❌ Error deleting show:", error);
+      await deleteShow(show._id).unwrap();
+      toast.success("✅ Show deleted successfully");
+      onUpdate?.();
+    } catch (err) {
       toast.error("Failed to delete show");
     }
   };
@@ -42,19 +32,10 @@ const ShowCard: React.FC<Props> = ({ show, onUpdate }) => {
   ) => {
     const newStatus = e.target.value as ShowType["status"];
     try {
-      const { data } = await axios.patch("/api/owner/updateShowStatus", {
-        showId: show._id,
-        newStatus,
-      });
-
-      if (data.success) {
-        toast.success(data.message);
-        onUpdate?.();
-      } else {
-        toast.error(data.message);
-      }
+      await updateShowStatus({ showId: show._id, newStatus }).unwrap();
+      toast.success("✅ Show status updated");
+      onUpdate?.();
     } catch (err) {
-      console.error(err);
       toast.error("Failed to update show status");
     }
   };
@@ -62,18 +43,16 @@ const ShowCard: React.FC<Props> = ({ show, onUpdate }) => {
   return (
     <div className="bg-black border border-white text-white rounded-xl p-4 shadow-lg">
       <div className="flex gap-4">
-        {/* 🎬 Movie Poster */}
         <div className="relative w-28 h-40 border border-gray-800 rounded overflow-hidden">
           <Image
             src={show.movie?.poster_path || "/placeholder.jpg"}
             alt={show.movie?.title || "Movie"}
             fill
             className="object-cover"
-            sizes="112px" // w-28 = 112px
+            sizes="112px"
           />
         </div>
 
-        {/* 📝 Show + Movie Info */}
         <div className="flex-1">
           <h2 className="text-xl font-bold mb-1">{show.movie?.title}</h2>
           <p className="text-sm italic text-gray-300 mb-2">
@@ -91,25 +70,33 @@ const ShowCard: React.FC<Props> = ({ show, onUpdate }) => {
             <strong>🎬 Movie Release:</strong> {show.movie?.release_date}
           </p>
           <p className="text-sm text-gray-400 mb-1">
-            <strong>⏱️ Runtime:</strong> {show.movie?.runtime} minutes
+            <strong>⏱️ Runtime:</strong> {show.movie?.runtime} min
           </p>
 
           <div className="mt-2">
             <label className="block text-sm mb-1">Show Status:</label>
             <select
               className="bg-gray-800 text-white p-2 rounded"
-              value={show.status}
+              value={
+                show.status === "scheduled" || show.status === "cancelled"
+                  ? show.status
+                  : "completed"
+              }
               onChange={handleStatusChange}
+              disabled={show.status === "completed"}
             >
               <option value="scheduled">Scheduled</option>
-              <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
+            {show.status === "completed" && (
+              <p className="text-xs text-green-400 mt-1">
+                ✅ This show is completed
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 💬 Reviews */}
       {show.showReview?.length > 0 && (
         <div className="mt-3 text-sm">
           <p className="font-semibold mb-1">💬 Reviews:</p>
@@ -124,7 +111,7 @@ const ShowCard: React.FC<Props> = ({ show, onUpdate }) => {
       )}
 
       <div className="mt-4 flex justify-end space-x-2">
-        {show.status !== "completed" && (
+        {(show.status === "scheduled" || show.status === "cancelled") && (
           <button
             onClick={() => router.push(`/theaterOwner/editShow/${show._id}`)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
@@ -132,7 +119,6 @@ const ShowCard: React.FC<Props> = ({ show, onUpdate }) => {
             ✏️ Edit Show
           </button>
         )}
-
         <button
           onClick={handleDelete}
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"

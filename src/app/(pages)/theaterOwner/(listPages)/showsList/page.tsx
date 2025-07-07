@@ -1,41 +1,22 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import ShowCard from "@/components/ownerComponents/cardComponents/ShowCard";
 import { useStateContext } from "@/context/StateContextProvider";
+import { useGetShowsQuery } from "@/app/serveces/app";
 import { ShowType } from "@/lib/types";
 
 const Page = () => {
   const { theaterList, blocks, fetchBlocks, selectedTheaterId } =
     useStateContext();
 
-  // ✅ This runs once on page load
-  useEffect(() => {
-    const runCleanup = async () => {
-      try {
-        const res = await fetch("/api/cleanupShows");
-        const data = await res.json();
-        console.log("Cleanup result:", data.message);
-      } catch (err) {
-        console.error("Error running cleanup:", err);
-      }
-    };
-
-    runCleanup();
-  }, []);
-
-  const handleRefresh = () => {
-    if (selectedTheaterId) {
-      fetchBlocks(selectedTheaterId);
-    } else {
-      console.warn("No theater selected yet.");
-    }
-  };
+  const { data, isLoading, refetch } = useGetShowsQuery(selectedTheaterId!, {
+    skip: !selectedTheaterId,
+  });
 
   return (
     <div className="p-8 text-white bg-black min-h-screen">
       <h1 className="text-3xl font-bold mb-6">🎬 View Shows by Theater</h1>
 
-      {/* 🎭 Theater Selector */}
       <div className="mb-6 space-x-4">
         {theaterList.map((theater) => (
           <button
@@ -52,39 +33,54 @@ const Page = () => {
         ))}
       </div>
 
-      {/* 🧱 Blocks & Shows */}
-      {blocks.length > 0 ? (
-        blocks.map((block) => (
-          <div
-            key={block._id}
-            className="mb-10 p-4 border border-white rounded-lg shadow-md"
-          >
-            <h2 className="text-2xl font-semibold mb-4">
-              🎯 Block: {block.name} ({block.screen})
-            </h2>
+      {isLoading && (
+        <div className="text-center text-gray-300 py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-4"></div>
+          Loading data...
+        </div>
+      )}
 
-            {block.movies?.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {block.movies.map((show: ShowType) => (
-                  <ShowCard
-                    key={show._id}
-                    show={show}
-                    onUpdate={handleRefresh}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-400 italic">
-                No shows available in this block.
-              </p>
-            )}
-          </div>
-        ))
-      ) : selectedTheaterId ? (
-        <p className="text-gray-500 italic">
-          No blocks found for this theater.
-        </p>
-      ) : null}
+      {!isLoading && (
+        <>
+          {blocks.length > 0 ? (
+            blocks.map((block) => {
+              const blockShows = (data?.shows || []).filter(
+                (show: ShowType) => show.blockId?._id === block._id
+              );
+              return (
+                <div
+                  key={block._id}
+                  className="mb-10 p-4 border border-white rounded-lg shadow-md"
+                >
+                  <h2 className="text-2xl font-semibold mb-4">
+                    🎯 Block: {block.name} ({block.screen})
+                  </h2>
+
+                  {blockShows.length > 0 ? (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {blockShows.map((show: ShowType) => (
+                        <ShowCard
+                          key={show._id}
+                          show={show}
+                          onUpdate={refetch}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 italic">
+                      No shows available in this block.
+                    </p>
+                  )}
+                </div>
+              );
+            })
+          ) : selectedTheaterId ? (
+            <p className="text-gray-500 italic">
+              No blocks found for this theater.
+            </p>
+          ) : null}
+        </>
+      )}
     </div>
   );
 };

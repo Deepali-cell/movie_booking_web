@@ -70,6 +70,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Theater and all related data deleted successfully",
+      theaters: theater,
     });
   } catch (error: any) {
     console.error("❌ Error deleting theater:", error);

@@ -121,7 +121,7 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data } = await axios.get("/api/owner/fetchTheatersList");
       if (data.success) {
-        settheaterList(data.list);
+        settheaterList(data.theaters);
       } else {
         toast.error(data.message);
       }
@@ -144,6 +144,7 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchBlocks = async (theaterId: string) => {
+    setSelectedTheaterId(theaterId);
     try {
       const { data } = await axios.get(
         `/api/owner/fetchBlockList?theaterId=${theaterId}`

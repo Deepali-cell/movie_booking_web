@@ -1,3 +1,4 @@
+// owner/deleteFoodCourt
 import ConnectDb from "@/lib/ConnectDb";
 import FoodCourt from "@/models/foodCourtModel";
 import Theater from "@/models/threaterModel";
@@ -54,6 +55,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Food court deleted and removed from theater successfully",
+      foodCourts: foodCourt,
     });
   } catch (error: any) {
     console.error("❌ Error deleting food court:", error);

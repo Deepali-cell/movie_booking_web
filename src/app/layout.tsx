@@ -1,10 +1,9 @@
+// app/layout.tsx (remains server component)
 import type { Metadata } from "next";
 import "./globals.css";
 import { Outfit } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
 import ClientLayout from "@/components/ClientLayout";
-import { Toaster } from "react-hot-toast";
-import { StateContextProvider } from "@/context/StateContextProvider";
+import Providers from "./providers/providers";
 
 const outfit = Outfit({
   variable: "--font-sans",
@@ -19,18 +18,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <ClerkProvider>
-      <StateContextProvider>
-        <html lang="en">
-          <body className={`${outfit.variable} antialiased`}>
-            <ClientLayout>{children}</ClientLayout>
-          </body>
-        </html>
-      </StateContextProvider>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={`${outfit.variable} antialiased`}>
+        <Providers>
+          <ClientLayout>{children}</ClientLayout>
+        </Providers>
+      </body>
+    </html>
   );
 }

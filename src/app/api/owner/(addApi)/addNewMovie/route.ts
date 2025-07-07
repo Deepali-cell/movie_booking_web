@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ New movie added and linked to theater",
-      movie: newMovie,
+      movies: newMovie,
     });
   } catch (error) {
     console.error("❌ Error adding movie:", error);

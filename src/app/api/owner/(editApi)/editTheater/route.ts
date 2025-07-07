@@ -75,7 +75,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Theater updated successfully!",
-      theater: updatedTheater,
+      theaters: updatedTheater,
     });
   } catch (error: any) {
     console.error("🚨 Error editing theater:", error);

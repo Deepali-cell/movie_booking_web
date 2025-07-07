@@ -1,3 +1,4 @@
+// owner/fetchFoodCourtList
 import ConnectDb from "@/lib/ConnectDb";
 import foodCourtModel from "@/models/foodCourtModel";
 import User from "@/models/userModel";
@@ -56,7 +57,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Food courts fetched successfully!",
-      foodCourtList: foodCourts,
+      foodCourts: foodCourts, // instead of foodCourtList
     });
   } catch (error: any) {
     console.error("🚨 Error fetching food courts:", error.message);

@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Theaters fetched successfully!",
-      list: theatersList,
+      theaters: theatersList,
     });
   } catch (error: any) {
     console.error("🚨 Error fetching theaters:", error.message);

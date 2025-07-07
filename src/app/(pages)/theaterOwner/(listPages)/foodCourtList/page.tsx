@@ -1,106 +1,73 @@
 "use client";
+import {
+  useDeleteFoodCourtMutation,
+  useDeleteFoodItemMutation,
+  useGetFoodCourtsQuery,
+} from "@/app/serveces/foodCourtApi";
 import Loading from "@/components/common/Loading";
 import FoodCourtCard from "@/components/ownerComponents/cardComponents/FoodCourtCard";
 import { useStateContext } from "@/context/StateContextProvider";
 import { BlockType, FoodCourtType, TheaterType } from "@/lib/types";
-import axios from "axios";
+import { skipToken } from "@reduxjs/toolkit/query";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
 const Page = () => {
-  const {
-    theaterList,
-    fetchBlocks,
-    blocks,
-    fetchFoodCourts,
-    foodCourts,
-    setFoodCourts,
-  } = useStateContext();
-
+  const { theaterList, fetchBlocks, blocks } = useStateContext();
   const [selectedTheaterId, setSelectedTheaterId] = useState<string | null>(
     null
   );
   const [viewOption, setViewOption] = useState<"blocks" | "all" | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // View by Blocks
+  const { data, isLoading } = useGetFoodCourtsQuery(
+    selectedTheaterId
+      ? {
+          theaterId: selectedTheaterId,
+          block:
+            viewOption === "blocks" ? selectedBlock ?? undefined : undefined,
+        }
+      : skipToken
+  );
+
+  const foodCourts: FoodCourtType[] = data?.foodCourts || [];
+  const [deleteFoodCourt] = useDeleteFoodCourtMutation();
+  const [deleteFoodItem] = useDeleteFoodItemMutation();
+  // Handlers
   const handleViewBlocks = async () => {
     if (!selectedTheaterId) return;
     setViewOption("blocks");
     setSelectedBlock(null);
-    setFoodCourts([]);
-    setLoading(true);
     await fetchBlocks(selectedTheaterId);
-    setLoading(false);
   };
 
-  // View All food courts in Theater
-  const handleViewAll = async () => {
+  const handleViewAll = () => {
     if (!selectedTheaterId) return;
     setViewOption("all");
     setSelectedBlock(null);
-    setLoading(true);
-    await fetchFoodCourts(selectedTheaterId);
-    setLoading(false);
   };
 
-  // Click Block to view its food courts
-  const handleBlockClick = async (blockName: string) => {
-    if (!selectedTheaterId) return;
+  const handleBlockClick = (blockName: string) => {
     setSelectedBlock(blockName);
-    setLoading(true);
-    await fetchFoodCourts(selectedTheaterId, blockName);
-    setLoading(false);
   };
 
-  // Delete food court
   const handleDeleteFoodCourt = async (foodCourtId: string) => {
     try {
-      const res = await axios.delete(
-        `/api/owner/deleteFoodCourt?foodCourtId=${foodCourtId}`
-      );
-      if (res.data.success) {
-        toast.success(res.data.message);
-        if (selectedTheaterId) {
-          setFoodCourts([]); // clear list immediately
-          setLoading(true);
-          await fetchFoodCourts(selectedTheaterId, selectedBlock || undefined);
-          setLoading(false);
-        }
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (err) {
-      console.error("Error deleting food court", err);
-      toast.error("Failed to delete food court");
+      await deleteFoodCourt(foodCourtId).unwrap();
+      toast.success("Deleted food court");
+    } catch {
+      toast.error("Delete failed");
     }
   };
 
-  // Delete food item
   const handleDeleteItem = async (foodCourtId: string, item: any) => {
     try {
-      const res = await axios.delete(
-        `/api/owner/deleteFoodItem?foodCourtId=${foodCourtId}&itemName=${encodeURIComponent(
-          item.name
-        )}`
-      );
-      if (res.data.success) {
-        toast.success(res.data.message);
-        if (selectedTheaterId) {
-          setFoodCourts([]);
-          setLoading(true);
-          await fetchFoodCourts(selectedTheaterId, selectedBlock || undefined);
-          setLoading(false);
-        }
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (err) {
-      console.error("Error deleting item", err);
-      toast.error("Failed to delete food item");
+      await deleteFoodItem({ foodCourtId, itemName: item.name }).unwrap();
+      toast.success("Deleted item");
+    } catch {
+      toast.error("Failed to delete item");
     }
   };
 
@@ -110,6 +77,7 @@ const Page = () => {
         🍟 View Food Courts by Theater
       </h1>
 
+      {/* Theater selection */}
       <div className="mb-6 space-x-4">
         {theaterList.map((theater: TheaterType) => (
           <button
@@ -118,7 +86,6 @@ const Page = () => {
               setSelectedTheaterId(theater._id);
               setViewOption(null);
               setSelectedBlock(null);
-              setFoodCourts([]);
             }}
             className={`px-4 py-2 rounded-full border transition ${
               selectedTheaterId === theater._id
@@ -156,7 +123,7 @@ const Page = () => {
         </div>
       )}
 
-      {loading ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <>

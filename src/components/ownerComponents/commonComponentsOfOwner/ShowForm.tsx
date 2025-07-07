@@ -5,17 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { BlockType, MovieType, TheaterType } from "@/lib/types";
-
-interface ShowFormData {
-  theaterId: string;
-  blockId: string;
-  movie: string;
-  showDate: string;
-  showTime: string;
-  showPrice: number;
-  status: "scheduled" | "cancelled" | "completed";
-}
+import { BlockType, MovieType, TheaterType, ShowFormData } from "@/lib/types";
 
 interface ShowFormProps {
   formData: ShowFormData;
@@ -68,7 +58,15 @@ const ShowForm: React.FC<ShowFormProps> = ({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <Label>Theater</Label>
+        <Label>
+          Theater{" "}
+          <span className="text-xs text-gray-500">
+            (currently:{" "}
+            {theaterList.find((t) => t._id === formData.theaterId)?.name ||
+              "N/A"}
+            )
+          </span>
+        </Label>
         <select
           name="theaterId"
           value={formData.theaterId}
@@ -86,7 +84,13 @@ const ShowForm: React.FC<ShowFormProps> = ({
       </div>
 
       <div>
-        <Label>Block</Label>
+        <Label>
+          Block{" "}
+          <span className="text-xs text-gray-500">
+            (currently:{" "}
+            {blocks.find((b) => b._id === formData.blockId)?.name || "N/A"})
+          </span>
+        </Label>
         <select
           name="blockId"
           value={formData.blockId}
@@ -104,7 +108,13 @@ const ShowForm: React.FC<ShowFormProps> = ({
       </div>
 
       <div>
-        <Label>Movie</Label>
+        <Label>
+          Movie{" "}
+          <span className="text-xs text-gray-500">
+            (currently:{" "}
+            {movies.find((m) => m._id === formData.movie)?.title || "N/A"})
+          </span>
+        </Label>
         <select
           name="movie"
           value={formData.movie}

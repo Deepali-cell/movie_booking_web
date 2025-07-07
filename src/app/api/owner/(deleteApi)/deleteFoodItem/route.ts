@@ -1,3 +1,4 @@
+// owner/deleteFoodItem
 import ConnectDb from "@/lib/ConnectDb";
 import FoodCourt from "@/models/foodCourtModel";
 import User from "@/models/userModel";
@@ -48,7 +49,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `✅ Item "${itemName}" deleted successfully`,
-      foodCourt: result,
+      foodCourts: result,
     });
   } catch (error: any) {
     console.error("❌ Error deleting food item:", error);

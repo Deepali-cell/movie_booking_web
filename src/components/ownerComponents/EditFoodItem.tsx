@@ -1,18 +1,24 @@
 "use client";
-
 import Loading from "@/components/common/Loading";
 import { FoodItemType } from "@/lib/types";
-import axios from "axios";
+import {
+  useGetFoodItemQuery,
+  useEditFoodItemMutation,
+} from "@/app/serveces/foodCourtApi";
 import { useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import toast from "react-hot-toast";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const EditFoodItem = () => {
   const searchParams = useSearchParams();
   const foodCourtId = searchParams.get("foodCourtId");
-
   const itemName = searchParams.get("itemName")?.trim();
   const router = useRouter();
+
+  const { data, isLoading } = useGetFoodItemQuery(
+    foodCourtId && itemName ? { foodCourtId, itemName } : skipToken
+  );
 
   const [formData, setFormData] = useState<FoodItemType>({
     _id: "",
@@ -24,32 +30,13 @@ const EditFoodItem = () => {
     isVegan: false,
   });
 
-  const [loading, setLoading] = useState(true);
+  const [editFoodItem] = useEditFoodItemMutation();
 
   useEffect(() => {
-    const fetchFoodItem = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get(
-          `/api/owner/fetchFoodItem?foodCourtId=${foodCourtId}&itemName=${itemName}`
-        );
-
-        if (data.success) {
-          setFormData(data.item);
-        } else {
-          toast.error(data.message || "Failed to load item.");
-        }
-      } catch (error) {
-        toast.error("Failed to fetch food item");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (foodCourtId && itemName) {
-      fetchFoodItem();
+    if (data?.item) {
+      setFormData(data.item);
     }
-  }, [foodCourtId, itemName]);
+  }, [data]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -65,27 +52,19 @@ const EditFoodItem = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.put<{ success: boolean; message: string }>(
-        `/api/owner/editFoodItem`,
-        {
-          foodCourtId,
-          originalName: itemName,
-          updatedItem: formData,
-        }
-      );
-
-      if (res.data.success) {
-        toast.success("Item updated successfully");
-        router.push("/theaterOwner/foodCourtList");
-      } else {
-        toast.error(res.data.message || "Failed to update item");
-      }
-    } catch (err) {
+      const res = await editFoodItem({
+        foodCourtId,
+        originalName: itemName,
+        updatedItem: formData,
+      }).unwrap();
+      toast.success("Item updated successfully");
+      router.push("/theaterOwner/foodCourtList");
+    } catch {
       toast.error("Failed to update item");
     }
   };
 
-  if (loading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return (
     <div className="min-h-screen bg-black text-white py-10 px-6">
@@ -171,4 +150,5 @@ const EditFoodItem = () => {
     </div>
   );
 };
+
 export default EditFoodItem;

@@ -59,7 +59,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Movie updated successfully",
-      movie: updatedMovie,
+      movies: updatedMovie,
     });
   } catch (error: any) {
     return NextResponse.json({

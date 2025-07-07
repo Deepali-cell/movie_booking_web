@@ -1,4 +1,4 @@
-
+// owner/editFoodCourt
 
 import ConnectDb from "@/lib/ConnectDb";
 import FoodCourt from "@/models/foodCourtModel";
@@ -47,7 +47,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Food court updated successfully!",
-      foodCourt: updated,
+      foodCourts: updated,
     });
   } catch (error: any) {
     console.error("Error updating food court:", error);

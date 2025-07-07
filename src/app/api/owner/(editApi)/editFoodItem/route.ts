@@ -1,4 +1,4 @@
-
+// owner/editFoodItem
 import { NextRequest, NextResponse } from "next/server";
 import ConnectDb from "@/lib/ConnectDb";
 import FoodCourt from "@/models/foodCourtModel";
@@ -41,6 +41,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Food item updated successfully",
+      foodCourts: foodCourt,
     });
   } catch (error) {
     return NextResponse.json({

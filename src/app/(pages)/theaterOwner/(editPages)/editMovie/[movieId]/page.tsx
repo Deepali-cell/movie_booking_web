@@ -1,12 +1,12 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useStateContext } from "@/context/StateContextProvider";
 import MovieForm from "@/components/ownerComponents/commonComponentsOfOwner/MovieForm";
+import axios from "axios";
 import { MovieFormType } from "@/lib/types";
+import { useEditMovieMutation } from "@/app/serveces/movieApi";
 
 const emptyMovieForm: MovieFormType = {
   title: "",
@@ -31,53 +31,42 @@ const EditMovie = () => {
   const { theaterList, uploadFile } = useStateContext();
   const [formData, setFormData] = useState<MovieFormType>(emptyMovieForm);
   const [selectedTheaterId, setSelectedTheaterId] = useState("");
+  const [editMovie] = useEditMovieMutation();
 
   useEffect(() => {
     if (!movieId) return;
-
     const fetchMovie = async () => {
       try {
         const { data } = await axios.get(
           `/api/getMovieById?movieId=${movieId}`
         );
         if (data.success) {
-          setFormData({
-            ...emptyMovieForm,
-            ...data.movie,
-          });
+          setFormData({ ...emptyMovieForm, ...data.movie });
           setSelectedTheaterId(data.movie.theaterId || "");
         } else {
           toast.error(data.message);
         }
-      } catch (error) {
+      } catch (err) {
         toast.error("Failed to load movie");
-        console.error(error);
+        console.error(err);
       }
     };
-
     fetchMovie();
   }, [movieId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await axios.put(
-        `/api/owner/editMovie?movieId=${movieId}`,
-        {
-          ...formData,
-          theaterId: selectedTheaterId,
-        }
-      );
-
-      if (data.success) {
-        toast.success("Movie updated successfully!");
-        router.replace("/theaterOwner/moviesList");
-      } else {
-        toast.error(data.message);
-      }
+      await editMovie({
+        movieId,
+        ...formData,
+        theaterId: selectedTheaterId,
+      }).unwrap();
+      toast.success("Updated movie successfully!");
+      router.replace("/theaterOwner/moviesList");
     } catch (err) {
       toast.error("Update failed");
-      console.error("❌", err);
+      console.error(err);
     }
   };
 

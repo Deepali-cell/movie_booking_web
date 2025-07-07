@@ -5,6 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { MovieType, TheaterType } from "@/lib/types";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/common/Loading"; // ✅ assuming you have this
 
 const Page = () => {
   const { theaterList, fetchMovies, movies, setMovies, uploadFile } =
@@ -16,11 +17,15 @@ const Page = () => {
   const [selectedMovie, setSelectedMovie] = useState<MovieType | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMovies, setLoadingMovies] = useState(false); // ✅ NEW
   const router = useRouter();
+
   const handleSelectTheater = async (theaterId: string) => {
     setSelectedTheaterId(theaterId);
     setSelectedMovie(null);
+    setLoadingMovies(true); // ✅ start loading movies
     await fetchMovies(theaterId);
+    setLoadingMovies(false); // ✅ stop after done
   };
 
   const handleAddShort = async () => {
@@ -31,10 +36,7 @@ const Page = () => {
 
     try {
       setLoading(true);
-      // ✅ upload to cloudinary first
       const url = await uploadFile(selectedFile);
-
-      // ✅ then send to your API
       const res = await axios.post("/api/owner/addNewShort", {
         movieId: selectedMovie._id,
         shortUrl: url,
@@ -91,30 +93,35 @@ const Page = () => {
       {selectedTheaterId && (
         <>
           <h2 className="text-2xl font-semibold mb-4">Select a Movie</h2>
-          <div className="flex gap-4 flex-wrap">
-            {movies.length ? (
-              movies.map((movie) => (
-                <button
-                  key={movie._id}
-                  onClick={() => setSelectedMovie(movie)}
-                  className={`px-4 py-2 border rounded ${
-                    selectedMovie?._id === movie._id
-                      ? "bg-white text-black"
-                      : "bg-transparent border-white text-white"
-                  }`}
-                >
-                  {movie.title}
-                </button>
-              ))
-            ) : (
-              <p>No movies found for this theater.</p>
-            )}
-          </div>
+
+          {loadingMovies ? (
+            <Loading /> // ✅ show loading while fetching movies
+          ) : (
+            <div className="flex gap-4 flex-wrap">
+              {movies.length ? (
+                movies.map((movie) => (
+                  <button
+                    key={movie._id}
+                    onClick={() => setSelectedMovie(movie)}
+                    className={`px-4 py-2 border rounded ${
+                      selectedMovie?._id === movie._id
+                        ? "bg-white text-black"
+                        : "bg-transparent border-white text-white"
+                    }`}
+                  >
+                    {movie.title}
+                  </button>
+                ))
+              ) : (
+                <p>No movies found for this theater.</p>
+              )}
+            </div>
+          )}
         </>
       )}
 
       {/* Show Shorts + Upload */}
-      {selectedMovie && (
+      {selectedMovie && !loadingMovies && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">
             Shorts for {selectedMovie.title}
