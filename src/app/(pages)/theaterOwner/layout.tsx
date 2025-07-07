@@ -11,7 +11,7 @@ import {
   Home,
   Video,
 } from "lucide-react";
-import { GiFoodTruck } from "react-icons/gi";
+import { GiBlockHouse, GiFoodTruck } from "react-icons/gi";
 
 export default function AdminLayout({
   children,
@@ -87,6 +87,11 @@ export default function AdminLayout({
       label: "Food Orders",
       href: "/theaterOwner/foodOrderList",
       icon: <ClipboardList size={20} />,
+    },
+    {
+      label: "Blocks List",
+      href: "/theaterOwner/blockList",
+      icon: <GiBlockHouse size={20} />,
     },
   ];
 

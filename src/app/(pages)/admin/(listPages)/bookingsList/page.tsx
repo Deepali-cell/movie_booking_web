@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BookingType, TheaterType } from "@/lib/types";
+import Loading from "@/components/common/Loading";
 
 const AdminBookingPage: React.FC = () => {
   const [bookings, setBookings] = useState<BookingType[]>([]);
@@ -40,7 +41,7 @@ const AdminBookingPage: React.FC = () => {
     }`;
   };
 
-  if (loading) return <p className="text-white">Loading...</p>;
+  if (loading) return <Loading />;
 
   return (
     <div className="p-6 text-white">

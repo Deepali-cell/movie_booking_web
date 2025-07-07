@@ -1,5 +1,7 @@
 "use client";
 
+import Loading from "@/components/common/Loading";
+import { Badge } from "@/components/ui/badge";
 import { useStateContext } from "@/context/StateContextProvider";
 import { ShowType, TheaterType } from "@/lib/types";
 import axios from "axios";
@@ -11,8 +13,10 @@ const AdminTheaterShowsPage = () => {
   const { alltheaterList } = useStateContext();
   const [selectedTheaterId, setSelectedTheaterId] = useState("");
   const [showList, setShowList] = useState<ShowType[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchShowList = async (theaterId: string) => {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `/api/admin/showsList?theaterId=${theaterId}`
@@ -26,6 +30,8 @@ const AdminTheaterShowsPage = () => {
     } catch (error) {
       console.log("❌ Error fetching shows:", error);
       toast.error("Error fetching shows");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,11 +40,36 @@ const AdminTheaterShowsPage = () => {
     setSelectedTheaterId(theaterId);
     if (theaterId) {
       fetchShowList(theaterId);
+    } else {
+      setShowList([]); // clear shows if no theater selected
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "scheduled":
+        return (
+          <Badge variant="outline" className="bg-blue-600">
+            {status}
+          </Badge>
+        );
+      case "cancelled":
+        return (
+          <Badge variant="outline" className="bg-red-600">
+            {status}
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="bg-green-600">
+            {status}
+          </Badge>
+        );
     }
   };
 
   return (
-    <div className=" px-4 md:px-10 text-white">
+    <div className="px-4 md:px-10 text-white">
       <h1 className="text-2xl font-bold mb-4">🎬 View Shows by Theater</h1>
 
       {/* Dropdown to select theater */}
@@ -55,8 +86,11 @@ const AdminTheaterShowsPage = () => {
         ))}
       </select>
 
+      {/* Loading */}
+      {loading && <Loading />}
+
       {/* Show List */}
-      {showList.length > 0 ? (
+      {!loading && showList.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {showList.map((show: ShowType, idx: number) => (
             <div
@@ -87,13 +121,16 @@ const AdminTheaterShowsPage = () => {
                 <p>
                   ⭐ {show.movie?.vote_average} ({show.movie?.vote_count} votes)
                 </p>
+                {getStatusBadge(show.status)}
               </div>
             </div>
           ))}
         </div>
-      ) : selectedTheaterId ? (
+      )}
+
+      {!loading && selectedTheaterId && showList.length === 0 && (
         <p className="text-gray-400 italic">No shows found for this theater.</p>
-      ) : null}
+      )}
     </div>
   );
 };

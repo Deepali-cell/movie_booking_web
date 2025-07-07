@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { TheaterType } from "@/lib/types";
+import Loading from "@/components/common/Loading";
 
 const AdminTheaterListPage = () => {
   const { alltheaterList } = useStateContext();
 
+  if (!alltheaterList) return <Loading />;
   return (
     <div className="px-4 md:px-10 text-white">
       <h1 className="text-2xl font-bold mb-6">🎭 All Theaters</h1>
