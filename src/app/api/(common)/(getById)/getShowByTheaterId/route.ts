@@ -59,10 +59,14 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("🚨 Error fetching shows:", error);
+    // ✅ Safe error message handling
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
     return NextResponse.json({
       success: false,
       message: "❌ Failed to fetch shows by theater id",
-      error: error?.message || "Unknown error",
+      error: errorMessage,
     });
   }
 }
