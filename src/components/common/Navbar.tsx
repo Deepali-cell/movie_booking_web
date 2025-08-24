@@ -4,13 +4,20 @@ import { useStateContext } from "@/context/StateContextProvider";
 import { useClerk, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { openSignIn } = useClerk();
   const { role, isSignedIn } = useStateContext();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null; // ✅ Prevents hydration mismatch
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -18,7 +25,6 @@ const Navbar = () => {
     { name: "Latest Movies", path: "/allMovies" },
   ];
 
-  // 👇 Add dashboard link based on role
   if (role === "admin") {
     navItems.push({ name: "Admin Dashboard", path: "/admin/dashboard" });
   } else if (role === "owner") {
@@ -26,21 +32,23 @@ const Navbar = () => {
   } else if (role === "user") {
     navItems.push({ name: "Group Plan", path: "/groupCreate" });
   }
+
   if (isSignedIn) {
     navItems.push({ name: "Favourites", path: "/favourites" });
     navItems.push({ name: "My Bookings", path: "/myBookings" });
     navItems.push({ name: "My Food Order", path: "/myFoodOrder" });
   }
+
   return (
     <nav className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex items-center justify-between text-white bg-transparent">
-      {/* Left - Logo */}
+      {/* Logo */}
       <div className="flex items-center">
         <Link href="/">
           <Image src={assets.logo} alt="Logo" width={80} height={80} />
         </Link>
       </div>
 
-      {/* Center - Nav Items (Desktop) */}
+      {/* Desktop Nav */}
       <ul className="hidden md:flex gap-10 font-medium border border-white rounded-full px-6 py-2 text-white">
         {navItems.map(({ name, path }) => (
           <li
@@ -52,7 +60,7 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {/* Right - Search + Login (Desktop) */}
+      {/* Right Section */}
       <div className="hidden md:flex items-center gap-4">
         <FaSearch className="text-white cursor-pointer text-lg" />
         {!isSignedIn ? (
@@ -68,13 +76,11 @@ const Navbar = () => {
             Login
           </button>
         ) : (
-          <>
-            <UserButton></UserButton>
-          </>
+          <UserButton />
         )}
       </div>
 
-      {/* Hamburger (Mobile) */}
+      {/* Mobile Menu Button */}
       <div className="md:hidden z-50">
         <button onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
@@ -89,7 +95,7 @@ const Navbar = () => {
               key={name}
               href={path}
               className="text-lg hover:text-red-400"
-              onClick={() => setMenuOpen(false)} // close menu on click
+              onClick={() => setMenuOpen(false)}
             >
               {name}
             </Link>
@@ -109,9 +115,7 @@ const Navbar = () => {
                 Login
               </button>
             ) : (
-              <>
-                <UserButton></UserButton>
-              </>
+              <UserButton />
             )}
           </div>
         </div>

@@ -11,23 +11,32 @@ export async function GET(req: NextRequest) {
     const movies = await Movie.find();
 
     if (!movies) {
-      return NextResponse.json({
-        success: false,
-        message: "Novies not found",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Movies not found",
+        },
+        { status: 404 }
+      ); // ❌ 401 mat bhejo yahan
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "✅Novies fetched successfully!",
-      movies,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "✅ Movies fetched successfully!",
+        movies,
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("🚨 Error fetching movies:", error.message);
-    return NextResponse.json({
-      success: false,
-      message: "❌ Failed to fetch movies",
-      error: error.message,
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        message: "❌ Failed to fetch movies",
+        error: error.message,
+      },
+      { status: 500 }
+    );
   }
 }

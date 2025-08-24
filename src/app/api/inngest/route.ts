@@ -46,7 +46,6 @@ const syncUserCreation = inngest.createFunction(
       role: "user",
     };
 
-    console.log("✅ Creating user:", userData);
     return await User.create(userData);
   }
 );
@@ -89,7 +88,6 @@ const syncUserUpdation = inngest.createFunction(
       role: existingUser.role,
     };
 
-    console.log("✅ Updating user:", userData);
     return await User.findByIdAndUpdate(id, userData, { new: true });
   }
 );

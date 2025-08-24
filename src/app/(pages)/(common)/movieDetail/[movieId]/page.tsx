@@ -31,6 +31,7 @@ const MovieDetailPage = () => {
   useEffect(() => {
     if (movieId) fetchMovie();
   }, [movieId, fetchMovie]);
+  // console.log("movie detail :", movie);
 
   if (!movie) {
     return <Loading />;

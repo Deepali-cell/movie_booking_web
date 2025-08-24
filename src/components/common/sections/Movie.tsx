@@ -4,7 +4,7 @@ import React, { useState, useEffect, MouseEvent } from "react";
 import { Heart } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
-import { useClerk } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs"; // 👈 useUser for auth check
 import { MovieType } from "@/lib/types";
 import Image from "next/image";
 
@@ -13,9 +13,15 @@ const Movie = ({ movie }: { movie: MovieType }) => {
   const [isFavourite, setIsFavourite] = useState(false);
   const [loading, setLoading] = useState(true);
   const { openSignIn } = useClerk();
+  const { isSignedIn } = useUser(); // 👈 check if user logged in
 
   useEffect(() => {
     const fetchFavourites = async () => {
+      if (!isSignedIn) {
+        setLoading(false);
+        return; // ❌ Don't call API if user not logged in
+      }
+
       try {
         const { data } = await axios.get("/api/findFavourities");
         if (data.success) {
@@ -31,45 +37,35 @@ const Movie = ({ movie }: { movie: MovieType }) => {
     };
 
     fetchFavourites();
-  }, [movie._id]);
+  }, [movie._id, isSignedIn]); // 👈 only run when user is authenticated
 
   const handleAddToFavourites = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
+    if (!isSignedIn) {
+      // 👈 If not logged in, open login popup
+      toast.error("Please login to add to favourites");
+      openSignIn({
+        afterSignInUrl: "/roleCheck",
+        afterSignUpUrl: "/roleCheck",
+      });
+      return;
+    }
+
     try {
-      const movieId = movie._id;
-      const { data } = await axios.post(
-        `/api/togglefavourities?movieId=${movieId}`
-      );
+      const { data } = await axios.post(`/api/favourites/${movie._id}`);
       if (data.success) {
         setIsFavourite((prev) => !prev);
         toast.success(data.message);
       } else {
-        if (data.message === "Unauthorized") {
-          toast.error("Please login to add to favourites");
-          openSignIn({
-            afterSignInUrl: "/roleCheck",
-            afterSignUpUrl: "/roleCheck",
-          });
-        } else {
-          toast.error(data.message);
-        }
+        toast.error(data.message);
       }
     } catch (error) {
       const axiosErr = error as AxiosError<{ message: string }>;
-      if (axiosErr.response?.status === 401) {
-        toast.error("Please login to add to favourites");
-        openSignIn({
-          afterSignInUrl: "/roleCheck",
-          afterSignUpUrl: "/roleCheck",
-        });
-      } else {
-        toast.error("Something went wrong");
-        console.error("Error toggling favourite", axiosErr);
-      }
+      toast.error(axiosErr.response?.data?.message || "Something went wrong");
+      console.error("Error toggling favourite", axiosErr);
     }
   };
-
   return (
     <div
       key={movie._id}

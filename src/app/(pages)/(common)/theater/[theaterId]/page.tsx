@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import TheaterInfo from "@/components/common/sections/TheaterInfo";
@@ -33,6 +33,11 @@ const Page = () => {
     }
   }, [theaterId]);
 
+  useEffect(() => {
+    if (theaterId) {
+      fetchTheaterDetails();
+    }
+  }, [theaterId, fetchTheaterDetails]);
   if (!detail) return <Loading />;
 
   return (

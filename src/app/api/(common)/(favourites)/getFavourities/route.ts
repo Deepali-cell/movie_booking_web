@@ -16,15 +16,14 @@ export async function GET() {
       );
     }
 
-    const user = await User.findById(userId).populate("favourites"); 
-    
+    const user = await User.findById(userId).populate("favourites");
+
     if (!user) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
+        { success: true, favourites: [] }, // no error, just empty list
+        { status: 200 }
       );
     }
-
     return NextResponse.json({
       success: true,
       favourites: user.favourites, // full movie objects
