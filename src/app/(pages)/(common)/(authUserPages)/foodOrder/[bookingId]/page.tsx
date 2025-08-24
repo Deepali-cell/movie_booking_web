@@ -27,7 +27,7 @@ const FoodCourtsPage = () => {
         const res = await axios.get(
           `/api/owner/fetchFoodCourtList?theaterId=${theaterId}&block=${block}`
         );
-        setFoodCourts(res.data?.foodCourtList || []);
+        setFoodCourts(res.data?.foodCourts || []);
       } catch (err) {
         console.error("Failed to fetch food courts:", err);
       } finally {
@@ -44,7 +44,7 @@ const FoodCourtsPage = () => {
   }
 
   return (
-    <div className="pt-20 px-4 max-w-6xl mx-auto text-white">
+    <div className="min-h-screen pt-20 px-4 max-w-6xl mx-auto text-white">
       <h1 className="text-3xl font-bold mb-6">🍽️ Choose a Food Court</h1>
 
       {foodCourts.length === 0 ? (

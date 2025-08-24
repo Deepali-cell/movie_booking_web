@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "✅ Food courts fetched successfully!",
-      foodCourts: foodCourts, // instead of foodCourtList
+      foodCourts: foodCourts,
     });
   } catch (error: any) {
     console.error("🚨 Error fetching food courts:", error.message);
