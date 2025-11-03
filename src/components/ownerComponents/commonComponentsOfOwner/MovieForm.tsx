@@ -1,5 +1,4 @@
 "use client";
-
 import React, { FormEvent } from "react";
 import Image from "next/image";
 import { MovieFormType, TheaterType } from "@/lib/types";
@@ -44,19 +43,16 @@ const MovieForm: React.FC<MovieFormProps> = ({
     const file = e.target.files?.[0];
     if (file && uploadFile) {
       const url = await uploadFile(file);
-      setFormData((prev) => ({
-        ...prev,
-        [key]: url,
-      }));
+      setFormData((prev) => ({ ...prev, [key]: url }));
     }
   };
 
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-6 bg-gray-900 p-6 rounded-xl text-white"
+      className="space-y-6 bg-gray-900 p-4 sm:p-6 rounded-xl text-white"
     >
-      {/* BASIC INPUTS */}
+      {/* Title */}
       <div>
         <label className="block mb-1 font-semibold">🎬 Title</label>
         <input
@@ -69,6 +65,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
         />
       </div>
 
+      {/* Overview */}
       <div>
         <label className="block mb-1 font-semibold">📝 Overview</label>
         <textarea
@@ -80,6 +77,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
         />
       </div>
 
+      {/* Tagline */}
       <div>
         <label className="block mb-1 font-semibold">📝 Tagline</label>
         <input
@@ -91,7 +89,8 @@ const MovieForm: React.FC<MovieFormProps> = ({
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      {/* 3-Column Inputs → become single column on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label className="block mb-1 font-semibold">🌐 Language</label>
           <input
@@ -102,6 +101,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
             className="w-full p-2 rounded bg-gray-800 border border-gray-700"
           />
         </div>
+
         <div>
           <label className="block mb-1 font-semibold">📅 Release Date</label>
           <input
@@ -112,6 +112,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
             className="w-full p-2 rounded bg-gray-800 border border-gray-700"
           />
         </div>
+
         <div>
           <label className="block mb-1 font-semibold">⭐ Rating</label>
           <input
@@ -124,7 +125,8 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Vote Count + Runtime → 2-col on big screens, 1-col on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block mb-1 font-semibold">👍 Vote Count</label>
           <input
@@ -135,6 +137,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
             className="w-full p-2 rounded bg-gray-800 border border-gray-700"
           />
         </div>
+
         <div>
           <label className="block mb-1 font-semibold">⏱️ Runtime (min)</label>
           <input
@@ -147,8 +150,9 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </div>
       </div>
 
-      {/* POSTER & BACKDROP */}
-      <div className="flex gap-4">
+      {/* Poster + Backdrop → stack on mobile */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Poster */}
         <div className="flex-1">
           <label className="block mb-1 font-semibold">🖼️ Poster</label>
           <input
@@ -168,6 +172,8 @@ const MovieForm: React.FC<MovieFormProps> = ({
             </div>
           )}
         </div>
+
+        {/* Backdrop */}
         <div className="flex-1">
           <label className="block mb-1 font-semibold">🖼️ Backdrop</label>
           <input
@@ -176,6 +182,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
             onChange={(e) => handleFileUpload(e, "backdrop_path")}
             className="w-full p-2 bg-gray-800 rounded"
           />
+
           {formData.backdrop_path && (
             <div className="relative mt-2 w-full h-40">
               <Image
@@ -189,7 +196,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </div>
       </div>
 
-      {/* SELECT THEATER */}
+      {/* Select Theater */}
       <div>
         <label className="block mb-1 font-semibold">🏛️ Select Theater</label>
         <select
@@ -207,11 +214,12 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </select>
       </div>
 
-      {/* GENRES */}
+      {/* Genres */}
       <div>
         <label className="block mb-1 font-semibold">🎭 Genres</label>
+
         {formData.genres.map((genre, idx) => (
-          <div key={idx} className="flex gap-2 mb-2">
+          <div key={idx} className="flex flex-col sm:flex-row gap-2 mb-2">
             <input
               type="text"
               value={genre.name}
@@ -222,18 +230,22 @@ const MovieForm: React.FC<MovieFormProps> = ({
               }}
               className="flex-1 p-2 rounded bg-gray-800 border border-gray-700"
             />
+
             <button
               type="button"
-              onClick={() => {
-                const newGenres = formData.genres.filter((_, i) => i !== idx);
-                setFormData((prev) => ({ ...prev, genres: newGenres }));
-              }}
-              className="bg-red-600 px-2 rounded"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  genres: prev.genres.filter((_, i) => i !== idx),
+                }))
+              }
+              className="bg-red-600 px-3 py-1 rounded"
             >
               ✕
             </button>
           </div>
         ))}
+
         <button
           type="button"
           onClick={() =>
@@ -248,11 +260,15 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </button>
       </div>
 
-      {/* CASTS */}
+      {/* Casts */}
       <div>
         <label className="block mb-1 font-semibold">🎭 Casts</label>
+
         {formData.casts.map((cast, idx) => (
-          <div key={idx} className="flex gap-2 mb-2">
+          <div
+            key={idx}
+            className="flex flex-col sm:flex-row gap-2 mb-2 items-start"
+          >
             <input
               type="text"
               placeholder="Name"
@@ -264,6 +280,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
               }}
               className="flex-1 p-2 rounded bg-gray-800 border border-gray-700"
             />
+
             <input
               type="file"
               accept="image/*"
@@ -276,20 +293,24 @@ const MovieForm: React.FC<MovieFormProps> = ({
                   setFormData((prev) => ({ ...prev, casts: newCasts }));
                 }
               }}
-              className="flex-1"
+              className="flex-1 sm:flex-none"
             />
+
             <button
               type="button"
-              onClick={() => {
-                const newCasts = formData.casts.filter((_, i) => i !== idx);
-                setFormData((prev) => ({ ...prev, casts: newCasts }));
-              }}
-              className="bg-red-600 px-2 rounded"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  casts: prev.casts.filter((_, i) => i !== idx),
+                }))
+              }
+              className="bg-red-600 px-3 py-1 rounded"
             >
               ✕
             </button>
           </div>
         ))}
+
         <button
           type="button"
           onClick={() =>
@@ -303,11 +324,16 @@ const MovieForm: React.FC<MovieFormProps> = ({
           + Add Cast
         </button>
       </div>
-      {/* SHORTS */}
+
+      {/* Shorts */}
       <div>
         <label className="block mb-1 font-semibold">🎞️ Shorts</label>
+
         {formData.shorts.map((short, idx) => (
-          <div key={idx} className="flex gap-2 mb-2 items-center">
+          <div
+            key={idx}
+            className="flex flex-col sm:flex-row gap-2 mb-2 items-start"
+          >
             <input
               type="file"
               accept="video/*"
@@ -322,25 +348,30 @@ const MovieForm: React.FC<MovieFormProps> = ({
               }}
               className="flex-1 p-2 bg-gray-800 rounded"
             />
+
             {short && (
               <video
                 src={short}
                 controls
-                className="w-32 h-20 rounded object-cover"
+                className="w-full sm:w-32 h-32 rounded object-cover"
               />
             )}
+
             <button
               type="button"
-              onClick={() => {
-                const newShorts = formData.shorts.filter((_, i) => i !== idx);
-                setFormData((prev) => ({ ...prev, shorts: newShorts }));
-              }}
-              className="bg-red-600 px-2 rounded"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  shorts: prev.shorts.filter((_, i) => i !== idx),
+                }))
+              }
+              className="bg-red-600 px-3 py-1 rounded"
             >
               ✕
             </button>
           </div>
         ))}
+
         <button
           type="button"
           onClick={() =>
@@ -355,7 +386,7 @@ const MovieForm: React.FC<MovieFormProps> = ({
         </button>
       </div>
 
-      {/* SUBMIT */}
+      {/* Submit */}
       <div className="flex justify-end">
         <button
           type="submit"

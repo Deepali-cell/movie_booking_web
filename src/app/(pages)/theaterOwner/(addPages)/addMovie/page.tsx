@@ -46,7 +46,7 @@ const AddMovie = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-3 sm:px-4 md:px-0">
       <MovieForm
         formData={formData}
         setFormData={setFormData}

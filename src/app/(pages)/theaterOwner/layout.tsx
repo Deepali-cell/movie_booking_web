@@ -1,5 +1,7 @@
+"use client";
+
 import SideBar from "@/components/common/SideBar";
-import React from "react";
+import React, { useState } from "react";
 import {
   LayoutDashboard,
   ListOrdered,
@@ -18,10 +20,10 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Step 1: Sidebar Items Array
+  const [open, setOpen] = useState(false);
+
   const sidebarItems = [
     { label: "Home", href: "/", icon: <Home size={20} /> },
-
     {
       label: "Add Theater",
       href: "/theaterOwner/addTheater",
@@ -62,7 +64,6 @@ export default function AdminLayout({
       href: "/theaterOwner/moviesList",
       icon: <ListOrdered size={20} />,
     },
-
     {
       label: "Theaters List",
       href: "/theaterOwner/theatersList",
@@ -97,7 +98,35 @@ export default function AdminLayout({
 
   return (
     <div className="flex min-h-screen">
-      <SideBar sidebarItems={sidebarItems} />
+      {/* ✅ Mobile Hamburger */}
+      <button
+        className="md:hidden p-3 text-white bg-black fixed top-4 left-4 rounded-lg z-50"
+        onClick={() => setOpen(true)}
+      >
+        ☰
+      </button>
+
+      {/* ✅ Mobile Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 w-64 bg-[#111] transform ${
+          open ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 z-40 md:hidden`}
+      >
+        <div className="p-4 text-right">
+          <button onClick={() => setOpen(false)} className="text-white text-xl">
+            ✕
+          </button>
+        </div>
+
+        <SideBar sidebarItems={sidebarItems} />
+      </div>
+
+      {/* ✅ Desktop Sidebar */}
+      <div className="hidden md:block w-64 bg-[#111]">
+        <SideBar sidebarItems={sidebarItems} />
+      </div>
+
+      {/* ✅ Content */}
       <div className="flex-1 p-4 text-white">{children}</div>
     </div>
   );
