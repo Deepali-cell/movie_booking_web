@@ -46,6 +46,7 @@ type StateContextType = {
   allmovies: MovieType[];
   setallMovies: React.Dispatch<React.SetStateAction<MovieType[]>>;
   fetchallMovies: () => Promise<void>;
+  hydrateAllTheaters: (list: TheaterType[]) => void; // ✅ ADD THIS
 };
 
 const StateContext = createContext<StateContextType>({
@@ -75,6 +76,7 @@ const StateContext = createContext<StateContextType>({
   allmovies: [],
   setallMovies: () => {},
   fetchallMovies: async () => {},
+  hydrateAllTheaters: () => {}, // ✅ ADD THIS
 });
 
 export const StateContextProvider = ({ children }: { children: ReactNode }) => {
@@ -96,7 +98,7 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
   // ✅ Strictly typed states
   const [theaterList, settheaterList] = useState<TheaterType[]>([]);
   const [selectedTheaterId, setSelectedTheaterId] = useState<string | null>(
-    null
+    null,
   );
   const [alltheaterList, setalltheaterList] = useState<TheaterType[]>([]);
   const [blocks, setBlocks] = useState<BlockType[]>([]);
@@ -130,24 +132,11 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const fetchAllTheaterList = async () => {
-    try {
-      const { data } = await axios.get("/api/allTheaters");
-      if (data.success) {
-        setalltheaterList(data.list);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log("❌ Frontend error while fetching all theaters:", error);
-    }
-  };
-
   const fetchBlocks = async (theaterId: string) => {
     setSelectedTheaterId(theaterId);
     try {
       const { data } = await axios.get(
-        `/api/owner/fetchBlockList?theaterId=${theaterId}`
+        `/api/owner/fetchBlockList?theaterId=${theaterId}`,
       );
       if (data.success) {
         setBlocks(data.blocks);
@@ -180,7 +169,7 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
     try {
       setSelectedTheaterId(theaterId);
       const res = await axios.get(
-        `/api/owner/fetchMovieList?theaterId=${theaterId}`
+        `/api/owner/fetchMovieList?theaterId=${theaterId}`,
       );
       setMovies(res.data.movies || []);
     } catch (error) {
@@ -192,7 +181,7 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
     setSelectedTheaterId(theaterId);
     try {
       const { data } = await axios.get(
-        `/api/owner/fetchBookingList?theaterId=${theaterId}`
+        `/api/owner/fetchBookingList?theaterId=${theaterId}`,
       );
 
       if (data.success) {
@@ -220,9 +209,9 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
     throw new Error("Upload failed");
   };
 
-  useEffect(() => {
-    fetchAllTheaterList();
-  }, []);
+  const hydrateAllTheaters = (list: TheaterType[]) => {
+    setalltheaterList(list);
+  };
 
   useEffect(() => {
     if (isLoaded && isSignedIn && role === "owner") {
@@ -233,6 +222,7 @@ export const StateContextProvider = ({ children }: { children: ReactNode }) => {
   return (
     <StateContext.Provider
       value={{
+        hydrateAllTheaters,
         user,
         role,
         isSignedIn: isSignedIn ?? false,

@@ -1,17 +1,26 @@
-"use client";
-import React from "react";
 import HeroSection from "@/components/common/HeroSection";
 import AllTheaters from "@/components/common/AllTheaters";
-import { useStateContext } from "@/context/StateContextProvider";
+import { StateHydrator } from "@/components/StateHydrator";
+import axios from "axios";
 
-const Page = () => {
-  const { alltheaterList } = useStateContext();
+async function getAllTheaters() {
+  const BASE_URL = "http://localhost:3000";
+  try {
+    const { data } = await axios.get(`${BASE_URL}/api/allTheaters`);
+    return data.list || [];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export default async function Page() {
+  const theaters = await getAllTheaters();
+
   return (
-    <>
+    <StateHydrator theaters={theaters}>
       <HeroSection />
-      <AllTheaters alltheaterList={alltheaterList} />
-    </>
+      <AllTheaters alltheaterList={theaters} />
+    </StateHydrator>
   );
-};
-
-export default Page;
+}
