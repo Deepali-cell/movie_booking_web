@@ -44,7 +44,10 @@ const AllTheaters = ({
           ))}
         </div>
       ) : (
-        <p className="text-gray-500 italic mt-8">No theaters available.</p>
+        <p className="text-gray-500 italic mt-8">
+          No theaters available. Please Wait for some Moment. Database is
+          Fetching the data.
+        </p>
       )}
     </div>
   );
